@@ -1,0 +1,9 @@
+.ag-theme-material {
+  --ag-foreground-color: #333;
+  --ag-header-background-color: #eee;
+  --ag-border-color: #ccc;
+}
+
+.ag-theme-material .ag-sort-order {
+  display: none !important;
+}
