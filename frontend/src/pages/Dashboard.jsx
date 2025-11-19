@@ -19,7 +19,7 @@ export default function Dashboard() {
 
   return (
     <Grid container spacing={2} p={2}>
-      <Grid size={12} m={2}>
+      <Grid size={12}>
         <Typography variant="h4">Dashboard</Typography>
       </Grid>
       <Grid size={12}>
@@ -34,9 +34,9 @@ export default function Dashboard() {
             <Typography variant="h6">Unresolved Cases</Typography>
           </AccordionSummary>
           <AccordionDetails>
-            <Grid size={12} sx={{ height: "80vh" }}>
+            <Grid size={12} sx={{ height: "75vh" }}>
               <DataGrid
-                rowData={resolvedCases}
+                rowData={unresolvedCases}
                 columnDefs={triageCaseColumnDefs}
               />
             </Grid>

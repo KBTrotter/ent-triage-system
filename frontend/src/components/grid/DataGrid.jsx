@@ -10,7 +10,7 @@ import { deepPurple } from "@mui/material/colors";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-const DataGrid = ({ rowData, columnDefs, ...gridOptions }) => {
+const DataGrid = ({ rowData, columnDefs, gridOptions = [] }) => {
   const theme = themeQuartz.withParams({
     // we can set up a MUI theme to centralize our own custom colors, but for now let's import colors from MUI
     // https://mui.com/material-ui/customization/color/
