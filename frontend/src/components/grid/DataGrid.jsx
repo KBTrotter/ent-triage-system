@@ -12,7 +12,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DataGrid = ({ rowData, columnDefs, ...gridOptions }) => {
   const theme = themeQuartz.withParams({
-    // we can set up a MUI theme to centralize our own custom colors, but for now let's use colors from MUI
+    // we can set up a MUI theme to centralize our own custom colors, but for now let's import colors from MUI
     // https://mui.com/material-ui/customization/color/
     headerBackgroundColor: deepPurple[200],
     backgroundColor: deepPurple[50],

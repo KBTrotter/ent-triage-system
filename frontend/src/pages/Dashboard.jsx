@@ -14,12 +14,8 @@ import { STATUS_VALUES } from "../constants/consts";
 
 export default function Dashboard() {
   // MOCK DATA
-  const unresolvedCases = mockData.triageCases.filter(
-    (c) => c.status === STATUS_VALUES.PENDING
-  );
-  const resolvedCases = mockData.triageCases.filter(
-    (c) => c.status === STATUS_VALUES.RESOLVED
-  );
+  const unresolvedCases = mockData.triageCases.filter((c) => c.status === STATUS_VALUES.PENDING);
+  const resolvedCases = mockData.triageCases.filter((c) => c.status === STATUS_VALUES.RESOLVED);
 
   return (
     <Grid container spacing={2} p={2}>
