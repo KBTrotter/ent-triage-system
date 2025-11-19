@@ -1,7 +1,9 @@
 import React from 'react';
-import { Chip, Box } from '@mui/material';
+import { Chip, IconButton } from '@mui/material';
+import { Edit } from "@mui/icons-material";
 import dayjs from 'dayjs';
 import { URGENCY_PRIORITY, URGENCY_LABELS, URGENCY_COLORS } from '../constants/consts';
+import { deepPurple } from '@mui/material/colors';
 
 export const UrgencyCellRenderer = (params) => {
   if (!params.value) return null
@@ -12,7 +14,7 @@ export const UrgencyCellRenderer = (params) => {
   return (
     <Chip
       label={label}
-      size="small"
+      size="medium"
       sx={{
         backgroundColor: color,
         color: 'white',
@@ -22,6 +24,26 @@ export const UrgencyCellRenderer = (params) => {
     />
   );
 };
+
+export const EditButtonCellRenderer = (params) => {
+  const handleEdit = () => {
+    console.log('Edit clicked for:', params.data);
+  };
+
+  return (
+    <IconButton
+      onClick={handleEdit}
+      size="medium"
+    >
+      <Edit />
+    </IconButton>
+  );
+};
+
+export const ageValueGetter = (dob) => {
+  if (!dob) return null;
+  return dayjs().diff(dayjs(dob), 'year');
+}
 
 export const dateTimeFormatter = (params) => {
   if (!params.value) return '-';

@@ -1,31 +1,34 @@
 import React from "react";
 import { AgGridReact } from "ag-grid-react";
-import { ModuleRegistry, AllCommunityModule } from "ag-grid-community";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-material.css";
+import {
+  ModuleRegistry,
+  AllCommunityModule,
+  themeQuartz,
+} from "ag-grid-community";
 import "./GridStyles.css";
+import { deepPurple } from "@mui/material/colors";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DataGrid = ({ rowData, columnDefs, ...gridOptions }) => {
-  const handleGridReady = (params) => {
-    params.api.sizeColumnsToFit();
-  };
+  const theme = themeQuartz.withParams({
+    // we can set up a MUI theme to centralize our own custom colors, but for now let's use colors from MUI
+    // https://mui.com/material-ui/customization/color/
+    headerBackgroundColor: deepPurple[200],
+    backgroundColor: deepPurple[50],
+    border: true,
+    rowHoverColor: deepPurple[100],
+  });
 
   return (
-    <div
-      className="ag-theme-material"
-      style={{ height: "100%", width: "100%" }}
-    >
-      <AgGridReact
-        theme="legacy"
-        rowData={rowData}
-        columnDefs={columnDefs}
-        onGridReady={handleGridReady}
-        tooltipShowDelay={0}
-        {...gridOptions}
-      />
-    </div>
+    <AgGridReact
+      theme={theme}
+      rowData={rowData}
+      columnDefs={columnDefs}
+      tooltipShowDelay={0}
+      enableCellTextSelection={true}
+      {...gridOptions}
+    />
   );
 };
 

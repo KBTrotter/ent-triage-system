@@ -1,3 +1,5 @@
+import { red, green, amber } from '@mui/material/colors';
+
 // this should reflect how these enums are stored in db
 export const URGENCY_VALUES = {
   ROUTINE: 'routine',
@@ -23,9 +25,9 @@ export const URGENCY_LABELS = {
 };
 
 export const URGENCY_COLORS = {
-  [URGENCY_VALUES.ROUTINE]: '#4CAF50',
-  [URGENCY_VALUES.SEMI_URGENT]: '#FF9800',
-  [URGENCY_VALUES.URGENT]: '#F44336',
+  [URGENCY_VALUES.ROUTINE]: green[800],
+  [URGENCY_VALUES.SEMI_URGENT]: amber[800],
+  [URGENCY_VALUES.URGENT]: red[800],
 };
 
 export const URGENCY_PRIORITY = {

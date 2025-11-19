@@ -2,13 +2,15 @@ import {
   UrgencyCellRenderer,
   urgencyComparator,
   dateTimeFormatter,
-} from '../utils/gridUtils';
+  ageValueGetter,
+  EditButtonCellRenderer,
+} from './gridUtils';
 
 export const triageCaseColumnDefs = [
   {
-    headerName: 'Urgency Level',
+    headerName: 'Urgency',
     field: 'urgencyLevel',
-    width: 150,
+    flex: 0.75,
     cellRenderer: UrgencyCellRenderer,
     filter: 'agTextColumnFilter',
     comparator: urgencyComparator,
@@ -17,18 +19,20 @@ export const triageCaseColumnDefs = [
   {
     headerName: 'Patient Name',
     field: 'name',
-    width: 180,
+    flex: 0.75,
     filter: 'agTextColumnFilter',
   },
   {
     headerName: 'Age',
-    width: 100,
+    field: 'dob',
+    flex: 0.5,
     filter: 'agNumberColumnFilter',
+    valueGetter: (params) => ageValueGetter(params.data?.dob),
   },
   {
     headerName: 'Date',
     field: 'dateCreated',
-    width: 150,
+    flex: 0.75,
     valueFormatter: dateTimeFormatter,
     filter: 'agDateColumnFilter',
     sort: 'desc',
@@ -36,10 +40,13 @@ export const triageCaseColumnDefs = [
   {
     headerName: 'AI Summary',
     field: 'aiSummary',
-    flex: 1,
-    minWidth: 300,
+    flex: 6,
     tooltipField: 'aiSummary',
     filter: 'agTextColumnFilter',
-    wrapText: false,
+  },
+  {
+    headerName: 'Edit',
+    flex: 0.5,
+    cellRenderer: EditButtonCellRenderer
   },
 ];
