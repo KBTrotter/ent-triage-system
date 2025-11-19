@@ -5,6 +5,17 @@ export const URGENCY_VALUES = {
   URGENT: 'urgent',
 };
 
+// this should reflect how these enums are stored in db
+export const STATUS_VALUES = {
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+};
+
+export const STATUS_LABELS = {
+  [STATUS_VALUES.PENDING]: 'Pending',
+  [STATUS_VALUES.RESOLVED]: 'Resolved',
+};
+
 export const URGENCY_LABELS = {
   [URGENCY_VALUES.ROUTINE]: 'Routine',
   [URGENCY_VALUES.SEMI_URGENT]: 'Semi-Urgent',
