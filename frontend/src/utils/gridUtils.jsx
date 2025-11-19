@@ -2,8 +2,7 @@ import React from 'react';
 import { Chip, IconButton } from '@mui/material';
 import { Edit } from "@mui/icons-material";
 import dayjs from 'dayjs';
-import { URGENCY_PRIORITY, URGENCY_LABELS, URGENCY_COLORS } from '../constants/consts';
-import { deepPurple } from '@mui/material/colors';
+import { URGENCY_PRIORITY, URGENCY_LABELS, URGENCY_COLORS } from '../utils/consts';
 
 export const UrgencyCellRenderer = (params) => {
   if (!params.value) return null

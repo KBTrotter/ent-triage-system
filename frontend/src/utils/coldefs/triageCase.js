@@ -4,7 +4,7 @@ import {
   dateTimeFormatter,
   ageValueGetter,
   EditButtonCellRenderer,
-} from './gridUtils';
+} from '../gridUtils';
 
 export const triageCaseColumnDefs = [
   {

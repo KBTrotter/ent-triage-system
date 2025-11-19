@@ -8,9 +8,9 @@ import {
 } from "@mui/material";
 import DataGrid from "../components/grid/DataGrid";
 import mockData from "../../mockData/triageCaseMockData.json";
-import { triageCaseColumnDefs } from "../utils/triageCase";
+import { triageCaseColumnDefs } from "../utils/coldefs/triageCase";
 import { ExpandMore } from "@mui/icons-material";
-import { STATUS_VALUES } from "../constants/consts";
+import { STATUS_VALUES } from "../utils/consts";
 
 export default function Dashboard() {
   // MOCK DATA
