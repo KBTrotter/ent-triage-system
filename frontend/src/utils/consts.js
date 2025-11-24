@@ -35,3 +35,8 @@ export const URGENCY_PRIORITY = {
   [URGENCY_VALUES.SEMI_URGENT]: 2,
   [URGENCY_VALUES.ROUTINE]: 3,
 };
+
+export const RETURNING_PATIENT_OPTIONS = [
+  { value: true, label: "Yes" },
+  { value: false, label: "No" },
+];
