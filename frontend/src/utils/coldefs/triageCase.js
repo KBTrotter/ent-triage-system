@@ -3,7 +3,7 @@ import {
   urgencyComparator,
   dateTimeFormatter,
   ageValueGetter,
-  EditButtonCellRenderer,
+  EditCaseButtonCellRenderer,
 } from '../gridUtils';
 
 export const triageCaseColumnDefs = [
@@ -18,8 +18,15 @@ export const triageCaseColumnDefs = [
     sort: "asc"
   },
   {
-    headerName: 'Patient Name',
-    field: 'name',
+    headerName: 'First Name',
+    field: 'first_name',
+    flex: 0.75,
+    minWidth: 150,
+    filter: 'agTextColumnFilter',
+  },
+  {
+    headerName: 'Last Name',
+    field: 'last_name',
     flex: 0.75,
     minWidth: 150,
     filter: 'agTextColumnFilter',
@@ -53,6 +60,7 @@ export const triageCaseColumnDefs = [
     headerName: 'Edit',
     flex: 0.5,
     minWidth: 100,
-    cellRenderer: EditButtonCellRenderer
+    cellRenderer: EditCaseButtonCellRenderer,
+    sortable: false,
   },
 ];
