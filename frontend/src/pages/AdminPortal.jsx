@@ -1,4 +1,9 @@
+import Navbar from "../components/Navbar";
 export default function AdminPortal() {
-    return <h1>AdminPortal</h1>;
+  return (
+    <>
+      <Navbar />
+      <h1>AdminPortal</h1>;
+    </>
+  );
 }
-

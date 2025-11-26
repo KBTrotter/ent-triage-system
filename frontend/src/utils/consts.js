@@ -1,27 +1,27 @@
-import { red, green, amber } from '@mui/material/colors';
+import { red, green, amber } from "@mui/material/colors";
 
 // this should reflect how these enums are stored in db
 export const URGENCY_VALUES = {
-  ROUTINE: 'routine',
-  SEMI_URGENT: 'semi_urgent',
-  URGENT: 'urgent',
+  ROUTINE: "routine",
+  SEMI_URGENT: "semi_urgent",
+  URGENT: "urgent",
 };
 
 // this should reflect how these enums are stored in db
 export const STATUS_VALUES = {
-  PENDING: 'pending',
-  RESOLVED: 'resolved',
+  PENDING: "pending",
+  RESOLVED: "resolved",
 };
 
 export const STATUS_LABELS = {
-  [STATUS_VALUES.PENDING]: 'Pending',
-  [STATUS_VALUES.RESOLVED]: 'Resolved',
+  [STATUS_VALUES.PENDING]: "Pending",
+  [STATUS_VALUES.RESOLVED]: "Resolved",
 };
 
 export const URGENCY_LABELS = {
-  [URGENCY_VALUES.ROUTINE]: 'Routine',
-  [URGENCY_VALUES.SEMI_URGENT]: 'Semi-Urgent',
-  [URGENCY_VALUES.URGENT]: 'Urgent',
+  [URGENCY_VALUES.ROUTINE]: "Routine",
+  [URGENCY_VALUES.SEMI_URGENT]: "Semi-Urgent",
+  [URGENCY_VALUES.URGENT]: "Urgent",
 };
 
 export const URGENCY_COLORS = {
@@ -39,4 +39,9 @@ export const URGENCY_PRIORITY = {
 export const RETURNING_PATIENT_OPTIONS = [
   { value: true, label: "Yes" },
   { value: false, label: "No" },
+];
+
+export const NAV_PAGES = [
+  { label: "Dashboard", path: "/dashboard" },
+  { label: "Admin Portal", path: "/admin", role: "admin" },
 ];

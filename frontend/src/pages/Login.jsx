@@ -54,9 +54,9 @@ export default function Login() {
 
   // For testing purposes only
   // const handleAdminLogin = () => {
-  //     login("adminUser", "admin");
-  //     console.log("Admin user logged in");
-  //     navigate("/dashboard");
+  //   login("adminUser", "password", "admin");
+  //   console.log("Admin user logged in");
+  //   navigate("/dashboard");
   // };
 
   return (

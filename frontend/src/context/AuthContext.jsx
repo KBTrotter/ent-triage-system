@@ -8,8 +8,8 @@ export function AuthProvider({ children }) {
     return stored ? JSON.parse(stored) : null;
   });
 
-  const login = (username, role) => {
-    const userData = { username, role };
+  const login = (username, password, role = "User") => {
+    const userData = { username, password, role };
     setUser(userData);
     localStorage.setItem("user", JSON.stringify(userData));
   };
