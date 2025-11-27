@@ -8,6 +8,7 @@ import {
   URGENCY_COLORS,
 } from "../utils/consts";
 import CaseDetailsDialog from "../components/caseDetails/CaseDetailsDialog";
+import EditUserDialog from "../components/admin/EditUserDialog";
 
 export const UrgencyCellRenderer = (params) => {
   if (!params.value) return null;
@@ -29,11 +30,10 @@ export const UrgencyCellRenderer = (params) => {
   );
 };
 
-export const EditButtonCellRenderer = (params) => {
+export const EditCaseButtonCellRenderer = (params) => {
   const [open, setOpen] = React.useState(false);
-  const [caseData, setCaseData] = React.useState(null);
+  const caseData = params.data;
   const handleOpen = () => {
-    setCaseData(params.data);
     setOpen(true);
   };
   const handleClose = () => setOpen(false);
@@ -51,6 +51,33 @@ export const EditButtonCellRenderer = (params) => {
         open={open}
         onClose={handleClose}
         caseData={caseData}
+        onSave={handleSave}
+      />
+    </>
+  );
+};
+
+export const EditUserButtonCellRenderer = (params) => {
+  const [open, setOpen] = React.useState(false);
+  const userData = params.data;
+  const handleOpen = () => {
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
+  const handleSave = (updatedData) => {
+    console.log("Saved data:", updatedData);
+    handleClose();
+  };
+
+  return (
+    <>
+      <IconButton onClick={handleOpen} size="medium">
+        <Edit />
+      </IconButton>
+      <EditUserDialog
+        open={open}
+        onClose={handleClose}
+        userData={userData}
         onSave={handleSave}
       />
     </>

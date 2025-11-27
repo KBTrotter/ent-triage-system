@@ -36,7 +36,8 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      patientName: formData.name || "",
+      patientFirstName: formData.first_name || "",
+      patientLastName: formData.last_name || "",
       patientDOB: formData.dob || "",
       patientContact: formData.contactInfo || "",
       returningPatient: formData.returningPatient ?? false,
@@ -49,7 +50,8 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
       resolvedBy: formData.resolvedBy || "",
     },
     validationSchema: Yup.object({
-      patientName: Yup.string().required("Name is required"),
+      patientFirstName: Yup.string().required("Name is required"),
+      patientLastName: Yup.string().required("Name is required"),
       patientDOB: Yup.string().required("DOB is required"),
       patientContact: Yup.string(),
       patientInsurance: Yup.string(),
@@ -92,8 +94,14 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                 <RenderTextField
                   editMode={editMode}
                   formik={formik}
-                  fieldName="patientName"
-                  label="Name"
+                  fieldName="patientFirstName"
+                  label="First Name"
+                />
+                <RenderTextField
+                  editMode={editMode}
+                  formik={formik}
+                  fieldName="patientLastName"
+                  label="Last Name"
                 />
                 <RenderTextField
                   editMode={editMode}
