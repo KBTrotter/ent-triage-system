@@ -1,8 +1,7 @@
-import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { useFormik } from "formik";
 import * as Yup from "yup";
-import React from "react";
+import React, { useState } from "react";
 import { deepPurple } from "@mui/material/colors";
 import {
   Button,
@@ -18,46 +17,44 @@ import {
   IconButton,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
+import apiClient from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
-  const formik = useFormik({
-    initialValues: {
-      username: "",
-      password: "",
-    },
-    validationSchema: Yup.object({
-      username: Yup.string().required("Username is required"),
-      password: Yup.string().required("Password is required"),
-    }),
-    onSubmit: async (values) => {
-      console.log(values);
-      await new Promise((r) => setTimeout(r, 500));
-      login(values.username, values.password);
-      navigate("/dashboard");
-      setSubmitting(false);
-      resetForm();
-    },
-  });
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState("");
 
-  const [showPassword, setShowPassword] = React.useState(false);
-
-  const handleClickShowPassword = () => {
-    setShowPassword((prev) => !prev);
-  };
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   const handleForgotPassword = () => {
     console.log("Forgot Password clicked");
   };
 
-  const { login } = useAuth();
-  const navigate = useNavigate();
-
-  // For testing purposes only
-  // const handleAdminLogin = () => {
-  //   login("adminUser", "password", "admin");
-  //   console.log("Admin user logged in");
-  //   navigate("/dashboard");
-  // };
+  const formik = useFormik({
+    initialValues: { username: "", password: "" },
+    validationSchema: Yup.object({
+      username: Yup.string().required("Username is required"),
+      password: Yup.string().required("Password is required"),
+    }),
+    onSubmit: async (values, { setSubmitting }) => {
+      setError("");
+      try {
+        // Login request
+        const response = await apiClient.post("/auth/login", {
+          username: values.username,
+          password: values.password,
+        });
+        await login(response.data.access_token);
+        navigate("/dashboard");
+      } catch (err) {
+        setError("Invalid username or password");
+      } finally {
+        setSubmitting(false);
+      }
+    },
+  });
 
   return (
     <Box
@@ -134,7 +131,14 @@ export default function Login() {
                 </Typography>
               )}
             </FormControl>
-
+            {error && (
+              <Typography
+                variant="body2"
+                color="error"
+                sx={{ marginTop: "8px", textAlign: "center" }}>
+                {error}
+              </Typography>
+            )}
             <Button
               type="submit"
               sx={{
@@ -164,8 +168,6 @@ export default function Login() {
               Forgot Password?
             </Button>
           </form>
-          {/* This is for admin role testing purposes only */}
-          {/* <button onClick={handleAdminLogin}>Login as Admin</button> */}
         </CardContent>
       </Card>
     </Box>
