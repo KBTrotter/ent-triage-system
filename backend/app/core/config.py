@@ -10,22 +10,21 @@ class Settings(BaseSettings):
     DB_USER: str
     DB_PW: str
     DB_HOST: str
-    DB_PORT: str
+    DB_PORT: str = "5432"
     DB_NAME: str
     
     DEBUG: bool = False
     
     @property
-    def DATABASE_URL(self) -> str:
-        """Construct database URL from components"""
-        return f"postgresql://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+    def SQLALCHEMY_DATABASE_URL(self) -> str:
+        return f"postgresql://{self.DB_USER}:{self.DB_PW}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
     
     class Config:
         env_file = ".env"
         case_sensitive = True
 
 @lru_cache()
-def get_settings() -> Settings:
+def get_settings():
     return Settings()
 
 settings = get_settings()
