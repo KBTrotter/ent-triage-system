@@ -4,7 +4,6 @@ import {
   Typography,
   Button,
   Box,
-  Grid,
   IconButton,
   Avatar,
   Popover,
@@ -18,19 +17,19 @@ import { NAV_PAGES } from "../utils/consts";
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, loading } = useAuth();
 
-  const userRole = user ? user.role : null;
-  const userInitial = user ? user.username.charAt(0).toUpperCase() : "";
-  const username = user ? user.username : "";
+  if (loading) return null; // wait until AuthProvider finishes loading
+
+  const userRole = user?.role ?? null;
+  const userInitial = user?.first_initial ?? "";
+  const username = user?.username ?? "";
 
   const handleOpenUserMenu = (event) => {
     setAnchorEl(event.currentTarget);
-    console.log("User menu opened");
   };
   const handleCloseUserMenu = () => {
     setAnchorEl(null);
-    console.log("User menu closed");
   };
   const handleLogout = () => {
     logout();
