@@ -13,8 +13,6 @@ class Settings(BaseSettings):
     DB_PORT: str = "5432"
     DB_NAME: str
     
-    DEBUG: bool = False
-    
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> str:
         return f"postgresql://{self.DB_USER}:{self.DB_PW}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
@@ -23,8 +21,4 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = True
 
-@lru_cache()
-def get_settings():
-    return Settings()
-
-settings = get_settings()
+settings = Settings()
