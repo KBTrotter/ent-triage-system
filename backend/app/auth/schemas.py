@@ -1,16 +1,20 @@
-from pydantic import BaseModel
+from sqlmodel import SQLModel
 
-class Token(BaseModel):
+class Token(SQLModel):
     access_token: str
     token_type: str = "bearer"
 
-class LoginRequest(BaseModel):
-    username: str
+class LoginRequest(SQLModel):
+    email: str
     password: str
 
-class UserResponse(BaseModel):
+class UserResponse(SQLModel):
     userID: int
-    username: str
+    email: str
     role: str
+    firstName: str
+    lastName: str
     first_initial: str
+
+
     
