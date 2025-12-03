@@ -39,7 +39,6 @@ export const EditCaseButtonCellRenderer = (params) => {
   const handleClose = () => setOpen(false);
   const handleSave = (updatedData) => {
     console.log("Saved data:", updatedData);
-    handleClose();
   };
 
   return (

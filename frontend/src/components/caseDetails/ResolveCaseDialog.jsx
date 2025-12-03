@@ -41,7 +41,7 @@ export default function ResolveCaseDialog({
   };
   
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Please Enter Resolution Details:</DialogTitle>
       <DialogContent>
         <form onSubmit={formik.handleSubmit}>

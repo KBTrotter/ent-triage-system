@@ -77,6 +77,14 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
     formik.setFieldValue("resolvedBy", user?.username || "");
     setResolveMode(true);
   };
+  
+  const handleClose = () => () => {
+    // prevent closing by clicking background when in edit mode
+    if (editMode) {
+      return;
+    }
+    onClose();
+  }
 
   // Fields: Patient Name, DOB, Contact Info, Insurance Info, AiSummary, Override Summary, Clinician Notes
   // Dropdowns: Urgency Level, Returning Patient (Yes/No)
@@ -85,10 +93,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
     <>
       <Dialog
         open={open}
-        onClose={(_, reason) => {
-          if (reason === "backdropClick") return;
-          onClose();
-        }}
+        onClose={handleClose()}
         maxWidth="lg"
         fullWidth>
         <DialogTitle>Case Details</DialogTitle>
@@ -247,6 +252,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
             status: "resolved",
           });
           setResolveMode(false);
+          onClose();
         }}
       />
     </>
