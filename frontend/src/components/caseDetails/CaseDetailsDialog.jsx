@@ -83,7 +83,14 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+      <Dialog
+        open={open}
+        onClose={(_, reason) => {
+          if (reason === "backdropClick") return;
+          onClose();
+        }}
+        maxWidth="lg"
+        fullWidth>
         <DialogTitle>Case Details</DialogTitle>
         <DialogContent>
           <Grid container spacing={4}>
@@ -204,14 +211,15 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         <DialogActions>
           {editMode ? (
             <>
+              <Button onClick={formik.handleSubmit} variant="contained">
+                Save
+              </Button>
               <Button
                 onClick={() => {
+                  formik.resetForm();
                   setEditMode(false);
                 }}>
                 Cancel
-              </Button>
-              <Button onClick={formik.handleSubmit} variant="contained">
-                Save
               </Button>
             </>
           ) : (
