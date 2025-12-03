@@ -77,25 +77,21 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
     formik.setFieldValue("resolvedBy", user?.username || "");
     setResolveMode(true);
   };
-  
-  const handleClose = () => () => {
+
+  const handleClose = () => {
     // prevent closing by clicking background when in edit mode
     if (editMode) {
       return;
     }
     onClose();
-  }
+  };
 
   // Fields: Patient Name, DOB, Contact Info, Insurance Info, AiSummary, Override Summary, Clinician Notes
   // Dropdowns: Urgency Level, Returning Patient (Yes/No)
 
   return (
     <>
-      <Dialog
-        open={open}
-        onClose={handleClose()}
-        maxWidth="lg"
-        fullWidth>
+      <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
         <DialogTitle>Case Details</DialogTitle>
         <DialogContent>
           <Grid container spacing={4}>
