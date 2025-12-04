@@ -2,6 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, text
 from app.auth.routes import router as auth_routes
+from app.ai.routes import router as ai_routes
 from app.core.database import engine
 from app.core.config import settings
 from app.core.dependencies import get_db
@@ -9,6 +10,11 @@ from app.core.dependencies import get_db
 app = FastAPI()
 
 app.include_router(auth_routes)
+
+# Include the AI triage routes.  These endpoints live under the
+# /ai prefix and expose the triage chat, summarisation and
+# ranking functionality.
+app.include_router(ai_routes)
 
 app.add_middleware(
     CORSMiddleware,
