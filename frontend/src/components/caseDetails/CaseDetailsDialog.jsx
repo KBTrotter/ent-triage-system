@@ -78,12 +78,20 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
     setResolveMode(true);
   };
 
+  const handleClose = () => {
+    // prevent closing by clicking background when in edit mode
+    if (editMode) {
+      return;
+    }
+    onClose();
+  };
+
   // Fields: Patient Name, DOB, Contact Info, Insurance Info, AiSummary, Override Summary, Clinician Notes
   // Dropdowns: Urgency Level, Returning Patient (Yes/No)
 
   return (
     <>
-      <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
+      <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
         <DialogTitle>Case Details</DialogTitle>
         <DialogContent>
           <Grid container spacing={4}>
@@ -204,14 +212,15 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         <DialogActions>
           {editMode ? (
             <>
+              <Button onClick={formik.handleSubmit} variant="contained">
+                Save
+              </Button>
               <Button
                 onClick={() => {
+                  formik.resetForm();
                   setEditMode(false);
                 }}>
                 Cancel
-              </Button>
-              <Button onClick={formik.handleSubmit} variant="contained">
-                Save
               </Button>
             </>
           ) : (
@@ -239,6 +248,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
             status: "resolved",
           });
           setResolveMode(false);
+          onClose();
         }}
       />
     </>
