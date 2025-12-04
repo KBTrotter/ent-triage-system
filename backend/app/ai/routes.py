@@ -21,7 +21,7 @@ from typing import Any, List
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, Field
 
-from .ollama_client import generate_triage, summarize_call, rank_cases
+from .ollama_client import generate_triage, summarize_call, rank_cases, get_verification_questions_response
 
 
 router = APIRouter(prefix="/ai", tags=["AI"])
@@ -48,6 +48,15 @@ class SummaryItem(BaseModel):
 class RankRequest(BaseModel):
     """Request body for the ranking endpoint."""
     summaries: List[SummaryItem] = Field(..., description="List of summaries to rank", min_length=1)
+
+
+# Response model for verification questions
+class VerifyResponse(BaseModel):
+    """Schema for the verification questions endpoint response.
+
+    Contains a list of questions to ask the patient before triage begins.
+    """
+    questions: List[str]
 
 
 @router.post("/chat")
@@ -89,4 +98,22 @@ async def rank_endpoint(req: RankRequest) -> Any:
     parsed = result.get("parsed_json")
     if parsed is None:
         return {"raw_response": result.get("response"), "error": "unable to parse JSON"}
+    return parsed
+
+
+@router.get("/verify", response_model=VerifyResponse)
+async def verify_endpoint() -> Any:
+    """Return initial verification questions for the patient.
+
+    These static questions are used to confirm the caller's identity and collect
+    essential demographic and medical information before starting the AI triage
+    conversation.  No inference call is required for this endpoint.
+    """
+    try:
+        result = get_verification_questions_response()
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error: {e}")
+    parsed = result.get("parsed_json")
+    if parsed is None:
+        return {"error": "unable to retrieve verification questions"}
     return parsed

@@ -7,11 +7,16 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     ALLOWED_ORIGINS: list = ["http://localhost:5173"]
     
-    DB_USER: str
-    DB_PW: str
-    DB_HOST: str
+    DB_USER: str = "user"
+    DB_PW: str = "password"
+    DB_HOST: str = "localhost"
+    DB_NAME: str = "test_db"
+
+    # DB_USER: str
+    # DB_PW: str
+    # DB_HOST: str
     DB_PORT: str = "5432"
-    DB_NAME: str
+    # DB_NAME: str
     
     @property
     def SQLALCHEMY_DATABASE_URL(self) -> str:

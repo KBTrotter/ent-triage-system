@@ -26,6 +26,7 @@ from .ollama_client import (
     generate_triage,
     summarize_call,
     rank_cases,
+    get_verification_questions_response,
 )
 
 
@@ -70,6 +71,13 @@ def test_ranking():
     print("Parsed JSON:", json.dumps(parsed, indent=2))
     print(f"Latency: {result.get('latency_seconds', 'n/a'):.2f}s\n")
 
+def test_verification():
+    print("Testing verification questions...", flush=True)
+    result = get_verification_questions_response()
+    parsed = result.get("parsed_json")
+    print("Verification questions:", parsed)
+
+
 
 def main():
     try:
@@ -84,6 +92,10 @@ def main():
         test_ranking()
     except Exception as e:
         print(f"Ranking test failed: {e}")
+    try:
+        test_verification()
+    except Exception as e:
+        print(f"Verification test failed: {e}")
 
 
 if __name__ == "__main__":

@@ -15,53 +15,75 @@ Usage:
 from textwrap import dedent
 
 
-def build_triage_prompt(user_message: str) -> str:
-    """Return a system prompt for the triage chat task.
-
-    The model is instructed to ask concise follow‑up questions, extract
-    symptoms and red flags, and return a JSON object.  The caller
-    provides the user's latest message.
-
-    Args:
-        user_message: The most recent patient input.
-
-    Returns:
-        A formatted prompt string ready to be sent to the model.
+def build_triage_prompt(conversation: list[dict]) -> str:
     """
-    prompt = dedent(
-        f"""
-        You are an otolaryngology (ENT) triage assistant helping to
-        collect information from a patient.  The patient has provided
-        the following message:
+    Build a structured, clinically guided ENT triage prompt.
+    The model must conduct a structured interview, asking ONE question at a time.
+    """
 
-        "{user_message.strip()}"
+    system_instructions = """
+    You are a medical triage assistant specializing in ENT (Ear, Nose, and Throat).
+    Your goal is to collect structured clinical information to determine urgency.
 
-        Your tasks:
-        1. Identify and list all symptoms mentioned, noting their
-           severity (mild/moderate/severe) and duration where possible.
-        2. Detect any red‑flag symptoms for ENT emergencies (e.g., airway
-           compromise, active bleeding, sudden hearing loss, difficulty
-           swallowing, high fever).  Flag these clearly.
-        3. Ask a single concise follow‑up question to clarify missing
-           information that is critical for triage.  Do not ask more
-           than one question at a time.
-        4. Assess an overall urgency level: "low", "medium", or "high"
-           based on the presented information.
+    Follow this exact order of questions. Ask ONE question at a time.
+    Wait for the user's answer before asking the next question.
 
-        Respond **only** with a JSON object matching this schema:
-        {{
-          "follow_up_question": string,
-          "symptoms": [{{"name": string, "duration": string, "severity": string}}],
-          "red_flags": [string],
-          "urgency": string
-        }}
+    QUESTIONS TO ASK (in order):
+    1. DURATION: "How long have you had this symptom?"
+    2. SEVERITY: "Is your throat pain mild, moderate, or severe?"
+    3. STABILITY: "Is the symptom getting better, worse, or staying the same?"
+    4. AGGRAVATING FACTORS: "What makes the symptoms worse?"
+    5. RELIEVING FACTORS: "What makes the symptoms better?"
+    6. PREDISPOSING FACTORS: "Do you have diabetes, immune suppression, or other risk factors?"
+    7. ASSOCIATED SYMPTOMS: "Are there other symptoms that occur with this?"
+    8. CORRELATING DATA: "Have you had any test results, scans, or found any neck masses?"
 
-        Do not include any additional fields or narrative text.  The
-        JSON must be syntactically valid and parseable.  If no red
-        flags are present, return an empty list for "red_flags".
-        """
+    RED FLAG CONDITIONS (critical):
+    - difficulty breathing
+    - drooling
+    - inability to swallow
+    - neck swelling
+    - spitting up blood
+    - fever over 102F
+    - rapid progression
+
+    RULES:
+    - If a red flag is mentioned, IMMEDIATELY stop asking further questions.
+    - Respond with a short message advising urgent evaluation.
+    - Set urgency_level="emergent"
+
+    OUTPUT:
+    Always respond with a valid JSON dictionary with the following fields:
+    {
+    "next_question": string | null,
+    "duration": string | null,
+    "severity": string | null,
+    "stability": string | null,
+    "aggravating_factors": string | null,
+    "relieving_factors": string | null,
+    "predisposing_factors": string | null,
+    "associated_symptoms": string | null,
+    "correlating_data": string | null,
+    "red_flags_present": boolean,
+    "red_flags": list[str],
+    "urgency_level": "low" | "moderate" | "high" | "emergent",
+    "triage_complete": boolean
+    }
+
+    CONSTRAINTS:
+    - Never hallucinate answers
+    - Only fill fields that the user has mentioned
+    - Ask only ONE question at a time
+    - Never output natural language outside JSON
+    - Never output explanations outside JSON
+    """
+
+    conversation_text = "\n".join(
+        f"{turn['role']}: {turn['content']}" for turn in conversation
     )
-    return prompt
+
+    full_prompt = f"{system_instructions}\n\nConversation so far:\n{conversation_text}\n\nRespond with JSON only."
+    return full_prompt
 
 
 def build_summarization_prompt(transcript: str) -> str:
@@ -174,3 +196,51 @@ def build_ranking_prompt(summaries: list[dict]) -> str:
         """
     )
     return prompt
+
+
+# ---------------------------------------------------------------------------
+# Verification questions
+#
+# Before beginning an AI‑driven triage session, callers need to be verified
+# and some basic intake information collected.  These questions are asked
+# prior to any interaction with the language model.  They are returned as
+# a simple list of strings so they can be presented by the frontend without
+# requiring an inference call.  Keeping the questions in this module
+# centralises their definition so they can be updated easily in one place.
+
+def get_verification_questions() -> list[str]:
+    """Return a list of standard questions used to verify the patient.
+
+    These questions help confirm the caller's identity and collect
+    essential demographic and medical history before triage begins.  They
+    are deliberately kept simple and do not depend on any model output.
+
+    Returns:
+        A list of questions as strings.
+    """
+    #! QUESTIONS
+
+    """
+    (timing) How long have you had this symptom?
+
+    (severity) Is your “throat” pay mild or severe?
+
+    (stability or progressive) Is your symptom getting better or worse?
+
+    (aggravating factors) What specifically makes the symptoms worse?
+
+    (revealing factors) What specifically makes the symptoms better?
+
+    (contingent/pre-disposing factors) Is your immune system suppressed, diabetes?
+
+    (associating symptoms) Are there other symptoms that your finding when this occurs?
+
+    (correlating data) Test Results that implicate a more sever situation? Suspicious mass in your neck?
+    """
+    return [
+        "What is your full name?",
+        "What is your date of birth?",
+        "What is your phone number or email address?",
+        "Do you have any known allergies to medications?",
+        "Do you have any chronic medical conditions we should be aware of?",
+    ]

@@ -31,6 +31,7 @@ from .prompts import (
     build_triage_prompt,
     build_summarization_prompt,
     build_ranking_prompt,
+    get_verification_questions,
 )
 from .json_utils import repair_json
 
@@ -177,3 +178,23 @@ def rank_cases(summaries: List[Dict[str, Any]], *, model: str | None = None) -> 
     """
     prompt = build_ranking_prompt(summaries)
     return call_model(prompt, model or DEFAULT_RANK_MODEL)
+
+
+def get_verification_questions_response() -> Dict[str, Any]:
+    """Return verification questions packaged similarly to other responses.
+
+    The verification questions are static and do not require an LLM call.
+    This helper wraps them in a dictionary with a `parsed_json` key and
+    placeholder fields for `response` and `latency_seconds` to align with
+    the structure returned by other functions in this module.
+
+    Returns:
+        A dictionary containing the verification questions under
+        `parsed_json` and dummy metadata fields.
+    """
+    questions = get_verification_questions()
+    return {
+        "parsed_json": {"questions": questions},
+        "response": None,
+        "latency_seconds": 0.0,
+    }
