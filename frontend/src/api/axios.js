@@ -15,4 +15,20 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+apiClient.interceptors.response.use(
+  (response) => {
+    return response;
+  },
+  (error) => {
+    if (error.response) {
+      const { status, data } = error.response;
+      throw new Error(data?.message || `Request failed with status ${status}`);
+    } else if (error.request) {
+      throw new Error('Unable to reach server');
+    } else {
+      throw error;
+    }
+  }
+);
+
 export default apiClient;

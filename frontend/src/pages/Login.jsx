@@ -49,6 +49,7 @@ export default function Login() {
         await login(response.data.access_token);
         navigate("/dashboard");
       } catch (err) {
+        console.error(err)
         setError("Invalid username or password");
       } finally {
         setSubmitting(false);

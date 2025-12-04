@@ -12,15 +12,41 @@ import { triageCaseColumnDefs } from "../utils/coldefs/triageCase";
 import { ExpandMore } from "@mui/icons-material";
 import { STATUS_VALUES } from "../utils/consts";
 import Navbar from "../components/Navbar";
+import { useTriageCases } from "../context/TriageCaseContext";
 
 export default function Dashboard() {
+  const { fetchCases, getUnresolvedCases, getResolvedCases } = useTriageCases();
+  const [cases, setCases] = React.useState([]);
+
   // MOCK DATA
-  const unresolvedCases = mockData.triageCases.filter(
-    (c) => c.status === STATUS_VALUES.PENDING
-  );
-  const resolvedCases = mockData.triageCases.filter(
-    (c) => c.status === STATUS_VALUES.RESOLVED
-  );
+  // const unresolvedCases = mockData.triageCases.filter(
+  //   (c) => c.status === STATUS_VALUES.PENDING
+  // );
+  // const resolvedCases = mockData.triageCases.filter(
+  //   (c) => c.status === STATUS_VALUES.RESOLVED
+  // );
+
+  React.useEffect(() => {
+    const getCases = async () => {
+      console.log("fetching cases");
+      try {
+        const response = await fetchCases();
+        console.log("Cases", response.data.data);
+        setCases(response.data.data);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    getCases();
+  }, []);
+
+  const unresolvedCases = React.useMemo(() => {
+    return cases.filter(c => c.status !== 'resolved');
+  });
+
+  const resolvedCases = React.useMemo(() => {
+    return cases.filter(c => c.status === 'resolved');
+  });
 
   return (
     <>
@@ -35,7 +61,8 @@ export default function Dashboard() {
             defaultExpanded
             sx={{
               backgroundColor: "grey.100",
-            }}>
+            }}
+          >
             <AccordionSummary expandIcon={<ExpandMore />}>
               <Typography variant="h6">Unresolved Cases</Typography>
             </AccordionSummary>

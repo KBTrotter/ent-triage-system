@@ -13,6 +13,7 @@ from app.models import (
     TriageCaseUpdate,
     TriageCaseResolve,
     Message,
+    Patient,
 )
 
 router = APIRouter(prefix="/triage-cases", tags=["triage-cases"])
@@ -26,10 +27,20 @@ def get_all_cases(
     count_statement = select(func.count()).select_from(TriageCase)
     count = db.exec(count_statement).one()
     
-    statement = select(TriageCase).limit(limit)
-    cases = db.exec(statement).all()
+    statement = select(TriageCase, Patient).join(Patient).limit(limit)
+    results = db.exec(statement).all()
+    
+    cases_public = [
+        TriageCasePublic(
+            **case.model_dump(),
+            first_name=patient.first_name,
+            last_name=patient.last_name,
+            dob=patient.dob,
+        )
+        for case, patient in results
+    ]
 
-    return TriageCasesPublic(data=cases, count=count)
+    return TriageCasesPublic(data=cases_public, count=count)
 
 @router.get("/status/{status}", response_model=TriageCasesPublic)
 def get_cases_by_status(
@@ -87,6 +98,9 @@ def update_case(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ) -> Any:
+    if update.status.lower() == "resolved" or update.resolution_reason:
+        raise HTTPException(status_code=403, detail="Triage case cannot be resolved through generic update")
+    
     case = db.get(TriageCase, id)
     if not case:
         raise HTTPException(status_code=404, detail="Triage case not found")

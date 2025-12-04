@@ -5,6 +5,23 @@ from sqlmodel import Field, SQLModel
 
 class Message(SQLModel):
     message: str
+    
+class Patient(SQLModel, table=True):
+    __tablename__ = "Patient"
+    __table_args__ = {"schema": "ent"}
+    
+    patient_id: uuid.UUID = Field(
+        primary_key=True,
+        sa_column_kwargs={"name": "patientID"}
+    )
+    first_name: str = Field(sa_column_kwargs={"name": "firstName"})
+    last_name: str = Field(sa_column_kwargs={"name": "lastName"})
+    dob: date = Field(sa_column_kwargs={"name": "DOB"})
+    contact_info: str = Field(sa_column_kwargs={"name": "contactInfo"})
+    insurance_info: str = Field(sa_column_kwargs={"name": "insuranceInfo"})
+    returning_patient: bool = Field(sa_column_kwargs={"name": "returningPatient"})
+    language_preference: str = Field(sa_column_kwargs={"name": "languagePreference"})
+    verified: bool
 
 class TriageCaseBase(SQLModel):
     transcript: str
@@ -87,7 +104,9 @@ class TriageCaseResolve(SQLModel):
 
 class TriageCasePublic(TriageCaseBase):
     case_id: uuid.UUID
-    patient_id: uuid.UUID
+    first_name: str
+    last_name: str
+    dob: date
     date_created: date
     created_by: Optional[uuid.UUID] = None
     resolution_reason: Optional[str] = None
@@ -100,20 +119,3 @@ class TriageCasePublic(TriageCaseBase):
 class TriageCasesPublic(SQLModel):
     data: list[TriageCasePublic]
     count: int
-
-class Patient(SQLModel, table=True):
-    __tablename__ = "Patient"
-    __table_args__ = {"schema": "ent"}
-    
-    patient_id: uuid.UUID = Field(
-        primary_key=True,
-        sa_column_kwargs={"name": "patientID"}
-    )
-    first_name: str = Field(sa_column_kwargs={"name": "firstName"})
-    last_name: str = Field(sa_column_kwargs={"name": "lastName"})
-    dob: date = Field(sa_column_kwargs={"name": "DOB"})
-    contact_info: str = Field(sa_column_kwargs={"name": "contactInfo"})
-    insurance_info: str = Field(sa_column_kwargs={"name": "insuranceInfo"})
-    returning_patient: bool = Field(sa_column_kwargs={"name": "returningPatient"})
-    language_preference: str = Field(sa_column_kwargs={"name": "languagePreference"})
-    verified: bool

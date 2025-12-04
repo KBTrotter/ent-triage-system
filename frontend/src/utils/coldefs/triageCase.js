@@ -9,7 +9,7 @@ import {
 export const triageCaseColumnDefs = [
   {
     headerName: 'Urgency',
-    field: 'urgencyLevel',
+    field: 'urgency_level',
     flex: 0.75, // flex determines the proportion the column will take up
     minWidth: 100, // set minimum width to create overflow on smaller window sizes
     cellRenderer: UrgencyCellRenderer,
@@ -41,7 +41,7 @@ export const triageCaseColumnDefs = [
   },
   {
     headerName: 'Date',
-    field: 'dateCreated',
+    field: 'date_created',
     flex: 0.75,
     minWidth: 200,
     valueFormatter: dateTimeFormatter,
@@ -50,7 +50,7 @@ export const triageCaseColumnDefs = [
   },
   {
     headerName: 'AI Summary',
-    field: 'aiSummary',
+    field: 'ai_summary',
     flex: 6,
     minWidth: 300,
     tooltipField: 'aiSummary',

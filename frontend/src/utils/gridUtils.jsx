@@ -12,6 +12,7 @@ import EditUserDialog from "../components/admin/EditUserDialog";
 
 export const UrgencyCellRenderer = (params) => {
   if (!params.value) return null;
+  console.log(params.value)
 
   const label = URGENCY_LABELS[params.value];
   const color = URGENCY_COLORS[params.value];
