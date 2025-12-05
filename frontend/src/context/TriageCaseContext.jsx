@@ -6,20 +6,16 @@ const TriageCaseContext = createContext();
 export function TriageCaseProvider({ children }) {
   const [cases, setCases] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
 
   const fetchCases = useCallback(async () => {
     try {
       setLoading(true);
-      setError(null);
       const data = await triageCaseApi.getAllCases();
       const cases = data.cases;
       setCases(cases);
       return cases;
     } catch (err) {
-      setError(err.message);
       console.error('Error fetching cases:', err);
-      throw err;
     } finally {
       setLoading(false);
     }
@@ -41,7 +37,6 @@ export function TriageCaseProvider({ children }) {
       return await triageCaseApi.getCaseById(id);
     } catch (err) {
       console.error('Error fetching case:', err);
-      throw err;
     }
   }, []);
 
@@ -53,7 +48,6 @@ export function TriageCaseProvider({ children }) {
       return updatedCase;
     } catch (err) {
       console.error('Error updating case:', err);
-      throw err;
     }
   }, []);
 
@@ -65,7 +59,6 @@ export function TriageCaseProvider({ children }) {
       return updatedCase;
     } catch (err) {
       console.error('Error updating case:', err);
-      throw err;
     }
   }, []);
 
@@ -77,14 +70,12 @@ export function TriageCaseProvider({ children }) {
       return newCase;
     } catch (err) {
       console.error('Error creating case:', err);
-      throw err;
     }
   }, []);
 
   const value = {
     cases,
     loading,
-    error,
     fetchCases,
     fetchCaseById,
     updateCase,
