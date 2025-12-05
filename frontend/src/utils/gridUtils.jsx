@@ -45,7 +45,6 @@ export const EditCaseButtonCellRenderer = (params) => {
     setOpen(false);
   };
 
-  // utils/cellRenderers.jsx
   const handleSave = async (updatedData) => {
     setSaving(true);
     try {
