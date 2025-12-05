@@ -17,7 +17,6 @@ import {
   IconButton,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import apiClient from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 
 export default function Login() {
@@ -33,23 +32,20 @@ export default function Login() {
   };
 
   const formik = useFormik({
-    initialValues: { username: "", password: "" },
+    initialValues: { email: "", password: "" },
     validationSchema: Yup.object({
-      username: Yup.string().required("Username is required"),
+      email: Yup.string()
+        .email("Invalid email address")
+        .required("Email is required"),
       password: Yup.string().required("Password is required"),
     }),
     onSubmit: async (values, { setSubmitting }) => {
       setError("");
       try {
-        // Login request
-        const response = await apiClient.post("/auth/login", {
-          username: values.username,
-          password: values.password,
-        });
-        await login(response.data.access_token);
+        await login(values.email, values.password);
         navigate("/dashboard");
       } catch (err) {
-        setError("Invalid username or password");
+        setError("Invalid email or password");
       } finally {
         setSubmitting(false);
       }
@@ -80,14 +76,14 @@ export default function Login() {
           {/* Username */}
           <form onSubmit={formik.handleSubmit}>
             <TextField
-              name="username"
-              label="Username"
+              name="email"
+              label="Email"
               variant="outlined"
-              value={formik.values.username}
+              value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
-              error={formik.touched.username && Boolean(formik.errors.username)}
-              helperText={formik.touched.username && formik.errors.username}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
               fullWidth
             />
             {/* Password */}

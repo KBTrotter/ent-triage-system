@@ -9,7 +9,7 @@ class LoginRequest(SQLModel):
     password: str
 
 class UserResponse(SQLModel):
-    userID: int
+    userID: str
     email: str
     role: str
     firstName: str

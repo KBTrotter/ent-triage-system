@@ -17,13 +17,14 @@ import { NAV_PAGES } from "../utils/consts";
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
-  const { user, logout, loading } = useAuth();
+  const { user, logout } = useAuth();
 
-  if (loading) return null; // wait until AuthProvider finishes loading
-
+  // Account Popover user info
   const userRole = user?.role ?? null;
   const userInitial = user?.first_initial ?? "";
-  const username = user?.username ?? "";
+  const userFirstName = user?.firstName ?? "";
+  const userLastName = user?.lastName ?? "";
+  const username = `${userFirstName} ${userLastName}`;
 
   const handleOpenUserMenu = (event) => {
     setAnchorEl(event.currentTarget);
