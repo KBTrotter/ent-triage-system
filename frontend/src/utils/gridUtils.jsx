@@ -47,19 +47,14 @@ export const EditCaseButtonCellRenderer = (params) => {
 
   const handleSave = async (updatedData) => {
     setSaving(true);
-    try {
-      if (updatedData.resolutionReason) {
-        await resolveCase(caseData.caseID, {
-          resolutionReason: updatedData.resolutionReason,
-        });
-      } else {
-        await updateCase(caseData.caseID, updatedData);
-      }
-    } catch (error) {
-      console.error("Failed to update case:", error);
-    } finally {
-      setSaving(false);
+    if (updatedData.resolutionReason) {
+      await resolveCase(caseData.caseID, {
+        resolutionReason: updatedData.resolutionReason,
+      });
+    } else {
+      await updateCase(caseData.caseID, updatedData);
     }
+    setSaving(false);
   };
 
   return (
