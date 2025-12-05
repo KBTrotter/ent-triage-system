@@ -72,7 +72,6 @@ export const EditCaseButtonCellRenderer = (params) => {
         onClose={handleClose}
         caseData={caseData}
         onSave={handleSave}
-        saving={saving}
       />
     </>
   );
