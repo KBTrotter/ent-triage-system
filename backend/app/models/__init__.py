@@ -1,6 +1,5 @@
 from .models import (
   User,
-  RefreshToken,
   Message,
   PatientBase,
   Patient,

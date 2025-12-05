@@ -10,6 +10,7 @@ import {
 import CaseDetailsDialog from "../components/caseDetails/CaseDetailsDialog";
 import EditUserDialog from "../components/admin/EditUserDialog";
 import { useTriageCases } from "../context/TriageCaseContext";
+import { userService } from "../api/userService";
 
 export const UrgencyCellRenderer = (params) => {
   if (!params.value) return null;
@@ -74,16 +75,36 @@ export const EditCaseButtonCellRenderer = (params) => {
 
 export const EditUserButtonCellRenderer = (params) => {
   const [open, setOpen] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
   const userData = params.data;
 
   const handleOpen = () => {
     setOpen(true);
   };
 
-  const handleClose = () => setOpen(false);
+  const handleClose = () => {
+    setOpen(false);
+  };
 
-  const handleSave = (updatedData) => {
-    handleClose();
+  const handleSave = async (updatedData) => {
+    console.log("Saving with data: ", updatedData);
+    setSaving(true);
+    if (updatedData) {
+      try {
+        await userService.updateUser(userData.userID, updatedData);
+        params.onUserUpdated?.(); //refresh user grid after update
+        handleClose();
+      } catch (err) {
+        if (err.response?.status === 409) {
+          console.log("User with this email already exists"); // TODO: add display to dialog
+        } else {
+          console.log(
+            "Failed to update user: " + (err.message || "Unknown error")
+          );
+        }
+      }
+    }
+    setSaving(false);
   };
 
   return (
