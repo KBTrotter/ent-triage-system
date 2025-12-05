@@ -8,39 +8,34 @@ BEGIN
     END IF;
 END$$;
 
-DO $$
-BEGIN
-    IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'summary_status_enum') THEN
-        CREATE TYPE summary_status_enum AS ENUM ('pending', 'final', 'overridden');
-    END IF;
-END$$;
-
 SET search_path TO ent, public;
 
 CREATE TABLE "User" (
     "userID"       UUID PRIMARY KEY,
-    "name"         TEXT NOT NULL,
+    "firstName"    TEXT NOT NULL,
     "role"         TEXT NOT NULL,
     "passwordHash" TEXT NOT NULL,
-    "lastLogin"    DATE
+    "lastLogin"    DATE,
+    "lastName"     TEXT NOT NULL,
+    "email"        TEXT UNIQUE
 );
 
 CREATE TABLE "Patient" (
     "patientID"          UUID PRIMARY KEY,
-    "name"               TEXT NOT NULL,
+    "firstName"          TEXT NOT NULL,
     "DOB"                DATE,
     "contactInfo"        TEXT,
     "insuranceInfo"      TEXT,
     "returningPatient"   BOOLEAN DEFAULT FALSE,
     "languagePreference" TEXT,
-    "verified"           BOOLEAN DEFAULT FALSE
+    "verified"           BOOLEAN DEFAULT FALSE,
+    "lastName"           TEXT NOT NULL
 );
 
 CREATE TABLE "TriageCase" (
     "caseID"              UUID PRIMARY KEY,
     "patientID"           UUID NOT NULL,
     "transcript"          TEXT,
-    "urgencyLevel"        urgency_level_enum,
     "AIConfidence"        DOUBLE PRECISION,
     "AISummary"           TEXT,
     "status"              TEXT,
@@ -49,9 +44,10 @@ CREATE TABLE "TriageCase" (
     "resolutionReason"    TEXT,
     "resolutionTimestamp" TIMESTAMPTZ,
     "resolvedBy"          UUID,
-    "clinicianSummary"    TEXT,
     "overrideSummary"     TEXT,
-    "summaryStatus"       summary_status_enum,
+    "AIUrgency"           urgency_level_enum,
+    "overrideUrgency"     urgency_level_enum,
+    "clinicianSummary"    TEXT,
     CONSTRAINT fk_triage_patient
         FOREIGN KEY ("patientID") REFERENCES "Patient"("patientID") ON DELETE CASCADE,
     CONSTRAINT fk_triage_created_by
@@ -77,7 +73,6 @@ CREATE TABLE "Transcript" (
     "rawText"           TEXT,
     "entitiesExtracted" JSONB,
     "savedAt"           TIMESTAMPTZ DEFAULT NOW(),
-    "savedAt"           TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_transcript_case
         FOREIGN KEY ("caseID") REFERENCES "TriageCase"("caseID") ON DELETE CASCADE
 );
@@ -96,14 +91,14 @@ CREATE TABLE "AIInference" (
 );
 
 CREATE TABLE "AuditLog" (
-    "logID"        UUID PRIMARY KEY,
-    "userID"       UUID NOT NULL,
-    "caseID"       UUID,
-    "timestamp"    TIMESTAMPTZ DEFAULT NOW(),
+    "logID"         UUID PRIMARY KEY,
+    "userID"        UUID NOT NULL,
+    "caseID"        UUID,
+    "timestamp"     TIMESTAMPTZ DEFAULT NOW(),
     "changeDetails" JSONB,
-    "locked"       BOOLEAN DEFAULT FALSE,
-    "hash"         TEXT,
-    "previousHash" TEXT,
+    "locked"        BOOLEAN DEFAULT FALSE,
+    "hash"          TEXT,
+    "previousHash"  TEXT,
     CONSTRAINT fk_audit_user
         FOREIGN KEY ("userID") REFERENCES "User"("userID"),
     CONSTRAINT fk_audit_case
@@ -111,17 +106,9 @@ CREATE TABLE "AuditLog" (
 );
 
 CREATE INDEX idx_triage_patient   ON "TriageCase"("patientID");
-CREATE INDEX idx_triage_urgency   ON "TriageCase"("urgencyLevel");
 CREATE INDEX idx_transcript_case  ON "Transcript"("caseID");
 CREATE INDEX idx_aiinference_case ON "AIInference"("caseID");
 CREATE INDEX idx_audit_case       ON "AuditLog"("caseID");
-
-ALTER TABLE "User"
-    ADD COLUMN "email" TEXT UNIQUE;
-
-ALTER TABLE "TriageCase"
-    ADD COLUMN "AIUrgency" urgency_level_enum,
-    ADD COLUMN "overrideUrgency" urgency_level_enum;
 
 ALTER TYPE urgency_level_enum RENAME VALUE 'low' TO 'routine';
 ALTER TYPE urgency_level_enum RENAME VALUE 'medium' TO 'semi-urgent';
