@@ -61,7 +61,7 @@ export function TriageCaseProvider({ children }) {
     if (!id || !updates || Object.keys(updates).length === 0) return;
     try {
       const updatedCase = await triageCaseApi.resolveCase(id, updates);
-      setCases(prev => prev.map(c => c.id === id ? updatedCase : c));
+      setCases(prev => prev.map(c => c.caseID === id ? updatedCase : c));
       return updatedCase;
     } catch (err) {
       console.error('Error updating case:', err);
