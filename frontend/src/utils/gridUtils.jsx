@@ -9,6 +9,7 @@ import {
 } from "../utils/consts";
 import CaseDetailsDialog from "../components/caseDetails/CaseDetailsDialog";
 import EditUserDialog from "../components/admin/EditUserDialog";
+import { useTriageCases } from "../context/TriageCaseContext";
 
 export const UrgencyCellRenderer = (params) => {
   if (!params.value) return null;
@@ -32,13 +33,28 @@ export const UrgencyCellRenderer = (params) => {
 
 export const EditCaseButtonCellRenderer = (params) => {
   const [open, setOpen] = React.useState(false);
+  const [saving, setSaving] = React.useState(false);
+  const { updateCase, resolveCase } = useTriageCases();
   const caseData = params.data;
+
   const handleOpen = () => {
     setOpen(true);
   };
-  const handleClose = () => setOpen(false);
-  const handleSave = (updatedData) => {
-    console.log("Saved data:", updatedData);
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  const handleSave = async (updatedData) => {
+    setSaving(true);
+    if (updatedData.resolutionReason) {
+      await resolveCase(caseData.caseID, {
+        resolutionReason: updatedData.resolutionReason,
+      });
+    } else {
+      await updateCase(caseData.caseID, updatedData);
+    }
+    setSaving(false);
   };
 
   return (
@@ -59,12 +75,14 @@ export const EditCaseButtonCellRenderer = (params) => {
 export const EditUserButtonCellRenderer = (params) => {
   const [open, setOpen] = React.useState(false);
   const userData = params.data;
+
   const handleOpen = () => {
     setOpen(true);
   };
+
   const handleClose = () => setOpen(false);
+
   const handleSave = (updatedData) => {
-    console.log("Saved data:", updatedData);
     handleClose();
   };
 

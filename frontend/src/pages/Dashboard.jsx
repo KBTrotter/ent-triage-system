@@ -10,17 +10,33 @@ import DataGrid from "../components/grid/DataGrid";
 import mockData from "../../mockData/triageCaseMockData.json";
 import { triageCaseColumnDefs } from "../utils/coldefs/triageCase";
 import { ExpandMore } from "@mui/icons-material";
-import { STATUS_VALUES } from "../utils/consts";
 import Navbar from "../components/Navbar";
+import { useTriageCases } from "../context/TriageCaseContext";
 
 export default function Dashboard() {
-  // MOCK DATA
-  const unresolvedCases = mockData.triageCases.filter(
-    (c) => c.status === STATUS_VALUES.PENDING
-  );
-  const resolvedCases = mockData.triageCases.filter(
-    (c) => c.status === STATUS_VALUES.RESOLVED
-  );
+  const { 
+    cases,
+    loading,
+    fetchCases, 
+    getUnresolvedCases, 
+    getResolvedCases 
+  } = useTriageCases();
+
+  React.useEffect(() => {
+    const getCases = async () => {
+      console.log("Fetching cases");
+      await fetchCases();
+    };
+    getCases();
+  }, [fetchCases]);
+
+  const unresolvedCases = React.useMemo(() => {
+    return getUnresolvedCases();
+  }, [getUnresolvedCases]);
+
+  const resolvedCases = React.useMemo(() => {
+    return getResolvedCases();
+  }, [getResolvedCases]);
 
   return (
     <>
@@ -33,17 +49,19 @@ export default function Dashboard() {
           <Accordion
             disableGutters
             defaultExpanded
-            sx={{
-              backgroundColor: "grey.100",
-            }}>
+            sx={{ backgroundColor: "grey.100" }}
+          >
             <AccordionSummary expandIcon={<ExpandMore />}>
-              <Typography variant="h6">Unresolved Cases</Typography>
+              <Typography variant="h6">
+                Unresolved Cases ({unresolvedCases?.length || 0})
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Grid size={12} sx={{ height: "75vh" }}>
                 <DataGrid
-                  rowData={unresolvedCases}
+                  rowData={unresolvedCases || []}
                   columnDefs={triageCaseColumnDefs}
+                  loading={loading}
                 />
               </Grid>
             </AccordionDetails>
@@ -52,13 +70,16 @@ export default function Dashboard() {
         <Grid size={12}>
           <Accordion disableGutters sx={{ backgroundColor: "grey.100" }}>
             <AccordionSummary expandIcon={<ExpandMore />}>
-              <Typography variant="h6">Resolved Cases</Typography>
+              <Typography variant="h6">
+                Resolved Cases ({resolvedCases?.length || 0})
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Grid size={12} sx={{ height: "80vh" }}>
                 <DataGrid
-                  rowData={resolvedCases}
+                  rowData={resolvedCases || []}
                   columnDefs={triageCaseColumnDefs}
+                  loading={loading}
                 />
               </Grid>
             </AccordionDetails>

@@ -9,35 +9,37 @@ import {
 export const triageCaseColumnDefs = [
   {
     headerName: 'Urgency',
-    field: 'urgencyLevel',
     flex: 0.75, // flex determines the proportion the column will take up
     minWidth: 100, // set minimum width to create overflow on smaller window sizes
     cellRenderer: UrgencyCellRenderer,
     filter: 'agTextColumnFilter',
     comparator: urgencyComparator,
-    sort: "asc"
+    sort: "asc",
+    valueGetter: (params) => {
+      return params.data.overrideUrgency || params.data.AIUrgency;
+    }
   },
   {
     headerName: 'First Name',
-    field: 'first_name',
+    field: 'firstName',
     flex: 0.75,
     minWidth: 150,
     filter: 'agTextColumnFilter',
   },
   {
     headerName: 'Last Name',
-    field: 'last_name',
+    field: 'lastName',
     flex: 0.75,
     minWidth: 150,
     filter: 'agTextColumnFilter',
   },
   {
     headerName: 'Age',
-    field: 'dob',
+    field: 'DOB',
     flex: 0.5,
     minWidth: 100,
     filter: 'agNumberColumnFilter',
-    valueGetter: (params) => ageValueGetter(params.data?.dob),
+    valueGetter: (params) => ageValueGetter(params.data?.DOB),
   },
   {
     headerName: 'Date',
@@ -49,12 +51,16 @@ export const triageCaseColumnDefs = [
     sort: 'desc',
   },
   {
-    headerName: 'AI Summary',
-    field: 'aiSummary',
+    headerName: 'Summary',
     flex: 6,
     minWidth: 300,
-    tooltipField: 'aiSummary',
+    tooltipValueGetter: (params) => {
+      return params.data.overrideSummary || params.data.AISummary;
+    },
     filter: 'agTextColumnFilter',
+    valueGetter: (params) => {
+      return params.data.overrideSummary || params.data.AISummary;
+    }
   },
   {
     headerName: 'Edit',
