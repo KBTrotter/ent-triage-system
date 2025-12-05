@@ -10,25 +10,25 @@ import {
 } from "@mui/material";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { useAuth } from "../../context/AuthContext";
 export default function ResolveCaseDialog({
   open,
   onClose,
   onResolve,
-  initialResolvedBy,
 }) {
+  const { user } = useAuth();
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       resolutionReason: "",
-      resolvedBy: initialResolvedBy || "",
+      resolvedBy: user.email,
     },
     validationSchema: Yup.object({
       resolutionReason: Yup.string().required("Resolution reason is required"),
     }),
-    onSubmit: (values) => {
-      onResolve({
-        resolutionReason: values.resolutionReason,
-        resolvedBy: values.resolvedBy,
+    onSubmit: async (values) => {
+      await onResolve({
+        resolutionReason: values.resolutionReason, // api will autofill resolvedBy field
       });
       formik.resetForm();
       console.log("Resolution Details: ", values);
@@ -64,7 +64,7 @@ export default function ResolveCaseDialog({
               Resolved By:
             </Typography>
             <Typography variant="body1" margin="normal">
-              {formik.values.resolvedBy}
+              {user.email}
             </Typography>
           </Box>
         </form>

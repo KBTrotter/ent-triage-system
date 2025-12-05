@@ -15,6 +15,7 @@ import { useTriageCases } from "../context/TriageCaseContext";
 
 export default function Dashboard() {
   const { 
+    cases,
     loading,
     fetchCases, 
     getUnresolvedCases, 
@@ -23,7 +24,7 @@ export default function Dashboard() {
 
   React.useEffect(() => {
     const getCases = async () => {
-      console.log("Fetching cases...");
+      console.log("Fetching cases");
       try {
         await fetchCases();
       } catch (err) {

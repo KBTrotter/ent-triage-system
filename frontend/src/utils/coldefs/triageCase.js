@@ -54,7 +54,9 @@ export const triageCaseColumnDefs = [
     headerName: 'Summary',
     flex: 6,
     minWidth: 300,
-    tooltipField: 'AISummary',
+    tooltipValueGetter: (params) => {
+      return params.data.overrideSummary || params.data.AISummary;
+    },
     filter: 'agTextColumnFilter',
     valueGetter: (params) => {
       return params.data.overrideSummary || params.data.AISummary;

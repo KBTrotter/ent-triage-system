@@ -10,7 +10,6 @@ import {
 import CaseDetailsDialog from "../components/caseDetails/CaseDetailsDialog";
 import EditUserDialog from "../components/admin/EditUserDialog";
 import { useTriageCases } from "../context/TriageCaseContext";
-import { showToast } from "../utils/toast";
 
 export const UrgencyCellRenderer = (params) => {
   if (!params.value) return null;
@@ -35,7 +34,7 @@ export const UrgencyCellRenderer = (params) => {
 export const EditCaseButtonCellRenderer = (params) => {
   const [open, setOpen] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
-  
+
   const { updateCase, resolveCase } = useTriageCases();
   const caseData = params.data;
 
@@ -47,27 +46,24 @@ export const EditCaseButtonCellRenderer = (params) => {
     setOpen(false);
   };
 
-// utils/cellRenderers.jsx
-const handleSave = async (updatedData) => {
-  setSaving(true);
-  
-  try {
-    if (updatedData.status === "resolved") {
-      await resolveCase(caseData.case_id, updatedData.resolutionReason);
-      showToast("Case resolved successfully!", "success");
-    } else {
-      await updateCase(caseData.case_id, updatedData);
-      showToast("Case updated successfully!", "success");
+  // utils/cellRenderers.jsx
+  const handleSave = async (updatedData) => {
+    setSaving(true);
+    console.log("Updated case data:", JSON.stringify(updatedData));
+    try {
+      if (updatedData.resolutionReason) {
+        await resolveCase(caseData.caseID, {
+          resolutionReason: updatedData.resolutionReason,
+        });
+      } else {
+        await updateCase(caseData.caseID, updatedData);
+      }
+    } catch (error) {
+      console.error("Failed to update case:", error);
+    } finally {
+      setSaving(false);
     }
-
-    handleClose();
-  } catch (error) {
-    console.error("Failed to update case:", error);
-    showToast(error.message || "Failed to update case. Please try again.", "error");
-  } finally {
-    setSaving(false);
-  }
-};
+  };
 
   return (
     <>
@@ -88,15 +84,14 @@ const handleSave = async (updatedData) => {
 export const EditUserButtonCellRenderer = (params) => {
   const [open, setOpen] = React.useState(false);
   const userData = params.data;
-  
+
   const handleOpen = () => {
     setOpen(true);
   };
-  
+
   const handleClose = () => setOpen(false);
-  
+
   const handleSave = (updatedData) => {
-    console.log("Saved data:", updatedData);
     handleClose();
   };
 
@@ -122,7 +117,7 @@ export const ageValueGetter = (dob) => {
 
 export const dateTimeFormatter = (params) => {
   if (!params.value) return "-";
-  return dayjs(params.value).format("h:mm A, MM/DD/YYYY");
+  return dayjs(params.value).format("h:mm A, vMM/DD/YYYY");
 };
 
 export const urgencyComparator = (a, b) => {

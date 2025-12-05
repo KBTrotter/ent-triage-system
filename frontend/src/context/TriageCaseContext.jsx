@@ -12,8 +12,8 @@ export function TriageCaseProvider({ children }) {
     try {
       setLoading(true);
       setError(null);
-      const response = await triageCaseApi.getAllCases();
-      const cases = response.data.data;
+      const data = await triageCaseApi.getAllCases();
+      const cases = data.cases;
       setCases(cases);
       return cases;
     } catch (err) {
@@ -26,16 +26,17 @@ export function TriageCaseProvider({ children }) {
   }, []);
 
   const getUnresolvedCases = useCallback(() => {
-    if (!cases || cases.length === 0) return;
+    if (!cases || cases.length === 0) return [];
     return cases.filter(c => c.status !== 'resolved');
   }, [cases]);
 
   const getResolvedCases = useCallback(() => {
-    if (!cases || cases.length === 0) return;
+    if (!cases || cases.length === 0) return [];
     return cases.filter(c => c.status === 'resolved');
   }, [cases]);
 
   const fetchCaseById = useCallback(async (id) => {
+    if (!id) return;
     try {
       return await triageCaseApi.getCaseById(id);
     } catch (err) {
@@ -45,6 +46,7 @@ export function TriageCaseProvider({ children }) {
   }, []);
 
   const updateCase = useCallback(async (id, updates) => {
+    if (!id || !updates || Object.keys(updates).length === 0) return;
     try {
       const updatedCase = await triageCaseApi.updateCase(id, updates);
       setCases(prev => prev.map(c => c.id === id ? updatedCase : c));
@@ -55,23 +57,26 @@ export function TriageCaseProvider({ children }) {
     }
   }, []);
 
+    const resolveCase = useCallback(async (id, updates) => {
+    if (!id || !updates || Object.keys(updates).length === 0) return;
+    try {
+      const updatedCase = await triageCaseApi.resolveCase(id, updates);
+      setCases(prev => prev.map(c => c.id === id ? updatedCase : c));
+      return updatedCase;
+    } catch (err) {
+      console.error('Error updating case:', err);
+      throw err;
+    }
+  }, []);
+
   const createCase = useCallback(async (caseData) => {
+    if(!caseData || Object.keys(caseData).length === 0) return;
     try {
       const newCase = await triageCaseApi.createCase(caseData);
       setCases(prev => [...prev, newCase]);
       return newCase;
     } catch (err) {
       console.error('Error creating case:', err);
-      throw err;
-    }
-  }, []);
-
-  const deleteCase = useCallback(async (id) => {
-    try {
-      await triageCaseApi.deleteCase(id);
-      setCases(prev => prev.filter(c => c.id !== id));
-    } catch (err) {
-      console.error('Error deleting case:', err);
       throw err;
     }
   }, []);
@@ -84,7 +89,7 @@ export function TriageCaseProvider({ children }) {
     fetchCaseById,
     updateCase,
     createCase,
-    deleteCase,
+    resolveCase,
     getUnresolvedCases,
     getResolvedCases,
   };

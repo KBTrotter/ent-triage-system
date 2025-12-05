@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { useAuth } from "../../context/AuthContext";
@@ -27,6 +27,18 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const [resolveMode, setResolveMode] = useState(false);
   const { user } = useAuth();
 
+  const getChangedFields = (initial, current) => {
+    const changed = {};
+
+    Object.keys(current).forEach((key) => {
+      if (initial[key] !== current[key]) {
+        changed[key] = current[key];
+      }
+    });
+
+    return changed;
+  };
+
   useEffect(() => {
     if (caseData) {
       setFormData(caseData);
@@ -36,29 +48,29 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      patientFirstName: formData.firstName || "",
-      patientLastName: formData.lastName || "",
-      patientDOB: formData.dob || "",
-      patientContact: formData.contactInfo || "",
+      firstName: formData.firstName || "",
+      lastName: formData.lastName || "",
+      DOB: formData.DOB || "",
+      contactInfo: formData.contactInfo || "",
       returningPatient: formData.returningPatient ?? false,
-      caseUrgency: formData.urgencyLevel || "",
-      patientInsurance: formData.insuranceInfo || "Not Provided",
-      aiSummary: formData.aiSummary || "",
+      overrideUrgency: formData.overrideUrgency ? formData.overrideUrgency : formData.AIUrgency || "",
+      insuranceInfo: formData.insuranceInfo || "Not Provided",
+      AISummary: formData.AISummary || "",
       overrideSummary: formData.overrideSummary || "",
-      clinicNotes: formData.clinicianSummary || "",
-      caseResolutionReason: formData.resolutionReason || "",
+      clinicianSummary: formData.clinicianSummary || "",
+      resolutionReason: formData.resolutionReason || "",
       resolvedBy: formData.resolvedBy || "",
     },
     validationSchema: Yup.object({
-      patientFirstName: Yup.string().required("Name is required"),
-      patientLastName: Yup.string().required("Name is required"),
-      patientDOB: Yup.string().required("DOB is required"),
-      patientContact: Yup.string(),
-      patientInsurance: Yup.string(),
+      firstName: Yup.string().required("Name is required"),
+      lastName: Yup.string().required("Name is required"),
+      DOB: Yup.string().required("DOB is required"),
+      contactInfo: Yup.string(),
+      insuranceInfo: Yup.string(),
       overrideSummary: Yup.string(),
       clinicNotes: Yup.string(),
-      caseUrgency: Yup.string().required("Case urgency is required"),
-      caseResolutionReason: Yup.string().when("status", {
+      overrideUrgency: Yup.string().required("Case urgency is required"),
+      resolutionReason: Yup.string().when("status", {
         is: "resolved",
         then: (schema) => schema.required("Resolution reason is required"),
       }),
@@ -67,8 +79,9 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         then: (schema) => schema.required("Resolved by is required"),
       }),
     }),
-    onSubmit: (values) => {
-      onSave(values);
+    onSubmit: async (values) => {
+      const changedValues = getChangedFields(formik.initialValues, values);
+      await onSave(changedValues);
       setEditMode(false);
     },
   });
@@ -102,32 +115,32 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                 <RenderTextField
                   editMode={editMode}
                   formik={formik}
-                  fieldName="patientFirstName"
+                  fieldName="firstName"
                   label="First Name"
                 />
                 <RenderTextField
                   editMode={editMode}
                   formik={formik}
-                  fieldName="patientLastName"
+                  fieldName="lastName"
                   label="Last Name"
                 />
                 <RenderTextField
                   editMode={editMode}
                   formik={formik}
-                  fieldName="patientDOB"
+                  fieldName="DOB"
                   label="Date of Birth"
                   type="date"
                 />
                 <RenderTextField
                   editMode={editMode}
                   formik={formik}
-                  fieldName="patientContact"
+                  fieldName="contactInfo"
                   label="Contact Information"
                 />
                 <RenderTextField
                   editMode={editMode}
                   formik={formik}
-                  fieldName="patientInsurance"
+                  fieldName="insuranceInfo"
                   label="Insurance Info"
                 />
                 <RenderSelectField
@@ -153,7 +166,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                   <RenderSelectField
                     editMode={editMode}
                     formik={formik}
-                    fieldName="caseUrgency"
+                    fieldName="overrideUrgency"
                     label="Case Urgency"
                     options={Object.values(URGENCY_VALUES).map((v) => ({
                       value: v,
@@ -166,7 +179,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                   AI Summary
                 </Typography>
                 <Typography variant="body2">
-                  {formik.values.aiSummary || "---"}
+                  {formik.values.AISummary || "---"}
                 </Typography>
               </Box>
               {editMode || formik.values.overrideSummary ? (
@@ -181,11 +194,11 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                   Override Summary
                 </Button>
               )}
-              <Typography variant="h8">Case Notes</Typography>
+              <Typography variant="subtitle2">Case Notes</Typography>
               <RenderTextField
                 editMode={editMode}
                 formik={formik}
-                fieldName="clinicNotes"
+                fieldName="clinicianSummary"
                 label="Clinician Notes"
               />
 
@@ -195,7 +208,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                   <RenderTextField
                     editMode={false}
                     formik={formik}
-                    fieldName="caseResolutionReason"
+                    fieldName="resolutionReason"
                     label="Resolution Reason"
                   />
                   <RenderTextField
@@ -212,7 +225,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         <DialogActions>
           {editMode ? (
             <>
-              <Button onClick={formik.handleSubmit} variant="contained">
+              <Button onClick={handleSubmit} variant="contained">
                 Save
               </Button>
               <Button
@@ -239,14 +252,8 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
       <ResolveCaseDialog
         open={resolveMode}
         onClose={() => setResolveMode(false)}
-        initialResolvedBy={user?.username || ""}
         onResolve={(data) => {
-          onSave({
-            ...caseData,
-            resolutionReason: data.resolutionReason,
-            resolvedBy: data.resolvedBy,
-            status: "resolved",
-          });
+          onSave({ resolutionReason: data.resolutionReason, caseID: caseData.caseID });
           setResolveMode(false);
           onClose();
         }}

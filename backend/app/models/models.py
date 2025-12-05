@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field, Relationship
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, date
 import uuid
 
 class User(SQLModel, table=True):
@@ -31,11 +31,6 @@ class RefreshToken(SQLModel, table=True):
     user_id: uuid.UUID = Field(foreign_key="ent.User.userID")
 
     user: Optional["User"] = Relationship(back_populates="refreshTokens")
-
-import uuid
-from datetime import date, datetime
-from typing import Optional
-from sqlmodel import Field, SQLModel
 
 class Message(SQLModel):
     message: str
@@ -79,7 +74,6 @@ class TriageCaseBase(SQLModel):
     AIUrgency: Optional[str] = None
     clinicianSummary: Optional[str] = None
     overrideSummary: Optional[str] = None
-    summaryStatus: Optional[str] = None
     overrideUrgency: Optional[str] = None
 
 class TriageCase(TriageCaseBase, table=True):
@@ -130,5 +124,5 @@ class TriageCasePublic(TriageCaseBase, PatientBase):
     resolvedBy: Optional[uuid.UUID] = None
 
 class TriageCasesPublic(SQLModel):
-    data: list[TriageCasePublic] 
+    cases: list[TriageCasePublic] 
     count: int

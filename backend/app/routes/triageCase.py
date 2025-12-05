@@ -80,7 +80,7 @@ def get_all_cases(
     ]
 
     logger.info(f"GET /triage-cases/ - returned {count} cases")
-    return TriageCasesPublic(data=cases_public, count=count)
+    return TriageCasesPublic(cases=cases_public, count=count)
 
 @router.get("/status/{status}", response_model=TriageCasesPublic)
 def get_cases_by_status(
@@ -121,7 +121,7 @@ def get_cases_by_status(
         for case, patient in results
     ]
 
-    return TriageCasesPublic(data=cases_public, count=count)
+    return TriageCasesPublic(cases=cases_public, count=count)
 
 @router.get("/{id}", response_model=TriageCasePublic)
 def get_specific_case(

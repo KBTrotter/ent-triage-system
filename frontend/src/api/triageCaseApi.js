@@ -2,23 +2,28 @@ import apiClient from "./axios";
 
 class TriageCaseApi {
   async getAllCases() {
-    return apiClient.get('triage-cases/');
+    const res = await apiClient.get('triage-cases/');
+    return res.data;
   }
 
   async getCaseById(id) {
-    return apiClient.get(`/triage-cases/${id}`);
+    const res = apiClient.get(`/triage-cases/${id}`);
+    return res.data;
   }
 
   async createCase(caseData) {
-    return apiClient.post('/triage-cases', caseData);
+    const res = apiClient.post('/triage-cases', caseData);
+    return res.data;
   }
 
   async updateCase(id, updateData) {
-    return apiClient.put(`/triage-cases/${id}`, updateData);
+    const res = await apiClient.put(`/triage-cases/${id}`, updateData);
+    return res.data;
   }
 
-  async deleteCase(id) {
-    return apiClient.delete(`/triage-cases/${id}`);
+  async resolveCase(id, updateData) {
+  const res = await apiClient.patch(`/triage-cases/${id}/resolve`, updateData);
+  return res.data;
   }
 }
 
