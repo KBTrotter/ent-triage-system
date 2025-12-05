@@ -1,11 +1,15 @@
 from pydantic_settings import BaseSettings
-from functools import lru_cache
 
 class Settings(BaseSettings):
     JWT_SECRET_KEY: str = "access-secret"
     JWT_ALGORITHM: str = "HS256"
+    REFRESH_SECRET_KEY: str = "refresh-secret"
+    REFRESH_TOKEN_EXPIRE_DAYS: int = 7
+    COOKIE_SECURE: bool = True
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     ALLOWED_ORIGINS: list = ["http://localhost:5173"]
+    
+    REDIS_URL: str
     
     DB_USER: str
     DB_PW: str
