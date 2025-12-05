@@ -59,7 +59,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
       overrideSummary: formData.overrideSummary || "",
       clinicianSummary: formData.clinicianSummary || "",
       resolutionReason: formData.resolutionReason || "",
-      resolvedBy: formData.resolvedBy || "",
+      resolvedByEmail: formData.resolvedByEmail || "",
     },
     validationSchema: Yup.object({
       firstName: Yup.string().required("Name is required"),
@@ -74,7 +74,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         is: "resolved",
         then: (schema) => schema.required("Resolution reason is required"),
       }),
-      resolvedBy: Yup.string().when("status", {
+      resolvedByEmail: Yup.string().when("status", {
         is: "resolved",
         then: (schema) => schema.required("Resolved by is required"),
       }),
@@ -214,7 +214,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                   <RenderTextField
                     editMode={false}
                     formik={formik}
-                    fieldName="resolvedBy"
+                    fieldName="resolvedByEmail"
                     label="Resolved By"
                   />{" "}
                 </Box>

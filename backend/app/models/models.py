@@ -122,6 +122,7 @@ class TriageCasePublic(TriageCaseBase, PatientBase):
     resolutionReason: Optional[str] = None
     resolutionTimestamp: Optional[datetime] = None
     resolvedBy: Optional[uuid.UUID] = None
+    resolvedByEmail: Optional[str] = None
 
 class TriageCasesPublic(SQLModel):
     cases: list[TriageCasePublic] 

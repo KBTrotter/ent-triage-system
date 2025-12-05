@@ -26,6 +26,12 @@ def build_case_public(case: TriageCase, db: Session) -> TriageCasePublic:
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
     
+    resolved_by_email = None
+    if case.resolvedBy:
+        resolver = db.get(User, case.resolvedBy)
+        if resolver:
+            resolved_by_email = resolver.email
+            
     return TriageCasePublic(
         **case.model_dump(),
         firstName=patient.firstName,
@@ -36,6 +42,7 @@ def build_case_public(case: TriageCase, db: Session) -> TriageCasePublic:
         returningPatient=patient.returningPatient,
         languagePreference=patient.languagePreference,
         verified=patient.verified,
+        resolvedByEmail=resolved_by_email
     )
 
 def update_patient_info(
@@ -61,7 +68,12 @@ def get_all_cases(
     count_statement = select(func.count()).select_from(TriageCase)
     count = db.exec(count_statement).one()
     
-    statement = select(TriageCase, Patient).join(Patient).limit(limit)
+    statement = (
+        select(TriageCase, Patient, User.email)
+        .join(Patient)
+        .outerjoin(User, TriageCase.resolvedBy == User.userID)
+        .limit(limit)
+    )
     results = db.exec(statement).all()
     
     cases_public = [
@@ -75,8 +87,9 @@ def get_all_cases(
             returningPatient=patient.returningPatient,
             languagePreference=patient.languagePreference,
             verified=patient.verified,
+            resolvedByEmail=resolver_email,
         )
-        for case, patient in results
+        for case, patient, resolver_email in results
     ]
 
     logger.info(f"GET /triage-cases/ - returned {count} cases")
@@ -99,8 +112,9 @@ def get_cases_by_status(
     count = db.exec(count_statement).one()
     
     statement = (
-        select(TriageCase, Patient)
+        select(TriageCase, Patient, User.email)
         .join(Patient)
+        .outerjoin(User, TriageCase.resolvedBy == User.userID)
         .where(TriageCase.status == status)
         .limit(limit)
     )
@@ -117,8 +131,9 @@ def get_cases_by_status(
             returningPatient=patient.returningPatient,
             languagePreference=patient.languagePreference,
             verified=patient.verified,
+            resolvedByEmail=resolver_email,
         )
-        for case, patient in results
+        for case, patient, resolver_email in results
     ]
 
     return TriageCasesPublic(cases=cases_public, count=count)
