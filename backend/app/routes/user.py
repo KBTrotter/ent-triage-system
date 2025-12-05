@@ -67,10 +67,6 @@ def update_user(user_id: str, payload: UserUpdate, db: Session = Depends(get_db)
 	if not user:
 		raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 	
-	existing = db.exec(select(User).where(User.email == payload.email)).first()
-	if existing:
-		raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User with this email already exists")
-	
 	if payload.firstName is not None:
 		user.firstName = payload.firstName
 	if payload.lastName is not None:

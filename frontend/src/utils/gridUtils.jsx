@@ -95,13 +95,9 @@ export const EditUserButtonCellRenderer = (params) => {
         params.onUserUpdated?.(); //refresh user grid after update
         handleClose();
       } catch (err) {
-        if (err.response?.status === 409) {
-          console.log("User with this email already exists"); // TODO: add display to dialog
-        } else {
-          console.log(
-            "Failed to update user: " + (err.message || "Unknown error")
-          );
-        }
+        console.log(
+          "Failed to update user: " + (err.message || "Unknown error")
+        );
       }
     }
     setSaving(false);
