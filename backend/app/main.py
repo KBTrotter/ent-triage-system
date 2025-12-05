@@ -33,7 +33,6 @@ app.add_middleware(
 
 @app.get("/")
 def root():
-    logger.info("Root endpoint called")
     return {"message": "FastAPI + PostgreSQL Backend Running"}
 
 @app.get("/health")

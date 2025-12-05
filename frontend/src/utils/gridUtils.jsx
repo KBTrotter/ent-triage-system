@@ -34,7 +34,6 @@ export const UrgencyCellRenderer = (params) => {
 export const EditCaseButtonCellRenderer = (params) => {
   const [open, setOpen] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
-
   const { updateCase, resolveCase } = useTriageCases();
   const caseData = params.data;
 
@@ -49,7 +48,6 @@ export const EditCaseButtonCellRenderer = (params) => {
   // utils/cellRenderers.jsx
   const handleSave = async (updatedData) => {
     setSaving(true);
-    console.log("Updated case data:", JSON.stringify(updatedData));
     try {
       if (updatedData.resolutionReason) {
         await resolveCase(caseData.caseID, {

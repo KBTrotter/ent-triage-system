@@ -43,7 +43,7 @@ def update_patient_info(
     patient_updates: dict,
     db: Session
 ) -> Patient:
-    logger.debug(f"Updating patient {patient.patientID} with: {patient_updates}")
+    logger.info(f"Updating patient {patient.patientID} with: {patient_updates}")
     
     patient.sqlmodel_update(patient_updates)
     db.add(patient)
@@ -144,7 +144,7 @@ def create_new_case(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ) -> Any:
-    logger.debug(f"POST /triage-cases/ - user: {current_user.email}, body: {new_case.model_dump()}")
+    logger.info(f"POST /triage-cases/ - user: {current_user.email}, body: {new_case.model_dump()}")
     
     case = TriageCase.model_validate(new_case)
 
@@ -161,7 +161,7 @@ def update_case(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ) -> Any:
-    logger.debug(f"PUT /triage-cases/{id} - user: {current_user.email}, body: {update.model_dump(exclude_unset=True)}")
+    logger.info(f"PUT /triage-cases/{id} - user: {current_user.email}, body: {update.model_dump(exclude_unset=True)}")
     
     if update.status and update.status.lower() == "resolved" or update.resolutionReason:
         raise HTTPException(
@@ -224,7 +224,7 @@ def resolve_case(
     db: Session = Depends(get_db),
     current_user: dict = Depends(get_current_user)
 ) -> Any:
-    logger.debug(f"PATCH /triage-cases/{id}/resolve - user: {current_user.email}, body: {update.model_dump()}")
+    logger.info(f"PATCH /triage-cases/{id}/resolve - user: {current_user.email}, body: {update.model_dump()}")
     
     if not update.resolutionReason or not update.resolutionReason.strip():
         raise HTTPException(status_code=400, detail="Resolution reason is required and cannot be empty")
