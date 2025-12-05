@@ -31,7 +31,7 @@ export function AuthProvider({ children }) {
     restoreSession();
   }, []);
 
-  // Login: fetch user info before storing token
+  // Login
   const login = async (email, password) => {
     const response = await apiClient.post("/auth/login", { email, password });
     const accessToken = response.data.access_token;
