@@ -12,14 +12,11 @@ import {
 } from "@mui/material";
 import RenderTextField from "../fields/RenderTextField";
 import RenderSelectField from "../fields/RenderSelectField";
+import { USER_ROLE_OPTIONS } from "../../utils/consts";
 
-const USER_ROLE_OPTIONS = [
-  { value: "physician", label: "Physician" },
-  { value: "staff", label: "Staff" },
-  { value: "admin", label: "Admin" },
-];
+export default function CreateUserDialog({ open, onClose, onSave, error }) {
+  const [localError, setLocalError] = React.useState(null);
 
-export default function CreateUserDialog({ open, onClose, onSave }) {
   const formik = useFormik({
     initialValues: {
       firstName: "",
@@ -43,6 +40,7 @@ export default function CreateUserDialog({ open, onClose, onSave }) {
 
   const handleClose = () => {
     formik.resetForm();
+    setLocalError(null);
     onClose();
   };
 
@@ -51,6 +49,14 @@ export default function CreateUserDialog({ open, onClose, onSave }) {
       <DialogTitle>Create New User</DialogTitle>
       <DialogContent>
         <Box mt={2} display="flex" flexDirection="column" gap={2}>
+          {error && (
+            <Typography
+              variant="body2"
+              color="error"
+              sx={{ textAlign: "center", mb: 1 }}>
+              {error}
+            </Typography>
+          )}
           <RenderTextField
             editMode={true}
             formik={formik}

@@ -1,8 +1,10 @@
 import {
   EditUserButtonCellRenderer,
 } from '../gridUtils';
+import { roleLabel } from '../consts';
 
-export const userColumnDefs = [
+// callback so callers can pass refresh handlers (fetchUsers)
+export const userColumnDefs = (onUserUpdated) => [
   {
     headerName: 'First Name',
     field: 'firstName',
@@ -30,12 +32,14 @@ export const userColumnDefs = [
     flex: 0.5,
     minWidth: 150,
     filter: 'agTextColumnFilter',
+    valueFormatter: (params) => roleLabel(params.value),
   },
   {
     headerName: 'Edit',
     flex: 0.25,
     minWidth: 100,
     cellRenderer: EditUserButtonCellRenderer,
+    cellRendererParams: { onUserUpdated },
     sortable: false,
   },
 ];

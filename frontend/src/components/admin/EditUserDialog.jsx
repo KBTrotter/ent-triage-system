@@ -12,27 +12,27 @@ import {
 } from "@mui/material";
 import RenderTextField from "../fields/RenderTextField";
 import RenderSelectField from "../fields/RenderSelectField";
+import { USER_ROLE_OPTIONS } from "../../utils/consts";
 
-const USER_ROLE_OPTIONS = [
-  { value: "Physician", label: "Physician" },
-  { value: "Staff", label: "Staff" },
-  { value: "Admin", label: "Admin" },
-];
-
-export default function EditUserDialog({ open, onClose, userData, onSave }) {
+export default function EditUserDialog({
+  open,
+  onClose,
+  userData,
+  onSave,
+}) {
   const [editMode, setEditMode] = useState(false);
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      first_name: userData?.first_name || "",
-      last_name: userData?.last_name || "",
+      firstName: userData?.firstName || "",
+      lastName: userData?.lastName || "",
       email: userData?.email || "",
       role: userData?.role || "",
     },
     validationSchema: Yup.object({
-      first_name: Yup.string().required("First name is required"),
-      last_name: Yup.string().required("Last name is required"),
+      firstName: Yup.string().required("First name is required"),
+      lastName: Yup.string().required("Last name is required"),
       email: Yup.string()
         .email("Invalid email address")
         .required("Email is required"),
@@ -61,7 +61,7 @@ export default function EditUserDialog({ open, onClose, userData, onSave }) {
             <RenderTextField
               editMode={editMode}
               formik={formik}
-              fieldName="first_name"
+              fieldName="firstName"
             />
           </Grid>
           <Grid size={6}>
@@ -71,7 +71,7 @@ export default function EditUserDialog({ open, onClose, userData, onSave }) {
             <RenderTextField
               editMode={editMode}
               formik={formik}
-              fieldName="last_name"
+              fieldName="lastName"
             />
           </Grid>
           <Grid size={12}>

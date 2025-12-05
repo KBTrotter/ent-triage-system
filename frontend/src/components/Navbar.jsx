@@ -12,7 +12,7 @@ import React, { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { deepPurple, grey } from "@mui/material/colors";
-import { NAV_PAGES } from "../utils/consts";
+import { NAV_PAGES, roleLabel } from "../utils/consts";
 
 export default function Navbar() {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -72,7 +72,7 @@ export default function Navbar() {
             <Box>
               <Typography variant="subtitle1">{username}</Typography>
               <Typography variant="body1" color="textSecondary">
-                {userRole}
+                {roleLabel(userRole)}
               </Typography>
             </Box>
           </Box>
