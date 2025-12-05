@@ -1,63 +1,59 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import apiClient from "../api/axios";
-
+import { authService } from "../api/authService";
+import LoadingSpinner from "../components/LoadingSpinner";
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // to prevent flash
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
+  const [loading, setLoading] = useState(true);
 
-  // Load user on mount if token exists
+  // On mount, try to restore session
   useEffect(() => {
-    const fetchUser = async () => {
-      if (!token) {
+    const restoreSession = async () => {
+      // If access token exists, fetch user
+      if (authService.getAccessToken()) {
+        await fetchUser();
         setLoading(false);
         return;
       }
+      // Otherwise, try to refresh token
       try {
-        const response = await apiClient.get("/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(response.data);
+        const token = await authService.refreshToken(); // refresh token from cookie
+        authService.setAccessToken(token);
+        await fetchUser();
       } catch (err) {
-        setUser(null);
-        localStorage.removeItem("token");
-        setToken(null);
+        console.log("Not logged in:", err);
       } finally {
         setLoading(false);
       }
     };
+    restoreSession();
+  }, []);
 
-    fetchUser();
-  }, [token]);
+  // Login
+  const login = async (email, password) => {
+    const response = await apiClient.post("/auth/login", { email, password });
+    const accessToken = response.data.access_token;
+    authService.setAccessToken(accessToken);
+    await fetchUser();
+  };
 
-  // Login: fetch user info before storing token
-  const login = async (accessToken) => {
-    try {
-      const response = await apiClient.get("/auth/me", {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
-      localStorage.setItem("token", accessToken);
-      setToken(accessToken);
-      setUser(response.data);
-    } catch (err) {
-      setUser(null);
-      localStorage.removeItem("token");
-      setToken(null);
-    }
+  const fetchUser = async () => {
+    const user = await apiClient.get("/auth/me");
+    setUser(user.data);
   };
 
   // Logout
-  const logout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
+  const logout = async () => {
+    await apiClient.post("/auth/logout");
+    authService.logout();
     setUser(null);
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, logout }}>
+      {loading ? <LoadingSpinner /> : children}
     </AuthContext.Provider>
   );
 }
