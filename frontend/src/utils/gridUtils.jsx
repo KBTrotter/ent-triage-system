@@ -117,7 +117,7 @@ export const ageValueGetter = (dob) => {
 
 export const dateTimeFormatter = (params) => {
   if (!params.value) return "-";
-  return dayjs(params.value).format("h:mm A, vMM/DD/YYYY");
+  return dayjs(params.value).format("h:mm A, MM/DD/YYYY");
 };
 
 export const urgencyComparator = (a, b) => {

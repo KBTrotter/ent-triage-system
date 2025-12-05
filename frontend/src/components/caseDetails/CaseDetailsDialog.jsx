@@ -225,7 +225,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         <DialogActions>
           {editMode ? (
             <>
-              <Button onClick={handleSubmit} variant="contained">
+              <Button onClick={formik.handleSubmit} variant="contained">
                 Save
               </Button>
               <Button

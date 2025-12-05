@@ -25,11 +25,7 @@ export default function Dashboard() {
   React.useEffect(() => {
     const getCases = async () => {
       console.log("Fetching cases");
-      try {
-        await fetchCases();
-      } catch (err) {
-        console.error("Failed to fetch cases:", err);
-      }
+      await fetchCases();
     };
     getCases();
   }, [fetchCases]);

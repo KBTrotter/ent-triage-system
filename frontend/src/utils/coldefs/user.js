@@ -5,14 +5,14 @@ import {
 export const userColumnDefs = [
   {
     headerName: 'First Name',
-    field: 'first_name',
+    field: 'firstName',
     flex: 0.5,
     minWidth: 100,
     filter: 'agTextColumnFilter',
   },
   {
     headerName: 'Last Name',
-    field: 'last_name',
+    field: 'lastName',
     flex: 0.5,
     minWidth: 100,
     filter: 'agTextColumnFilter',
