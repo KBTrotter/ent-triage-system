@@ -36,8 +36,8 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      patientFirstName: formData.first_name || "",
-      patientLastName: formData.last_name || "",
+      patientFirstName: formData.firstName || "",
+      patientLastName: formData.lastName || "",
       patientDOB: formData.dob || "",
       patientContact: formData.contactInfo || "",
       returningPatient: formData.returningPatient ?? false,

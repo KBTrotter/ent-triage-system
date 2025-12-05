@@ -2,7 +2,7 @@ import apiClient from "./axios";
 
 class TriageCaseApi {
   async getAllCases() {
-    return apiClient.get('api/triage-cases/');
+    return apiClient.get('triage-cases/');
   }
 
   async getCaseById(id) {

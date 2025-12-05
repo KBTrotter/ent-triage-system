@@ -1,3 +1,5 @@
+# app/main.py
+import logging
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, text
@@ -6,6 +8,15 @@ from app.routes.triageCase import router as triage_routes
 from app.core.database import engine
 from app.core.config import settings
 from app.core.dependencies import get_db
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -22,13 +33,15 @@ app.add_middleware(
 
 @app.get("/")
 def root():
+    logger.info("Root endpoint called")
     return {"message": "FastAPI + PostgreSQL Backend Running"}
 
-# health check for db connection
 @app.get("/health")
 def health_check(db: Session = Depends(get_db)):
     try:
         db.exec(text("SELECT 1"))
+        logger.info("Health check: database connected")
         return {"status": "healthy", "database": "connected"}
     except Exception as e:
+        logger.error(f"Health check failed: {e}")
         return {"status": "unhealthy", "database": "disconnected", "error": str(e)}
