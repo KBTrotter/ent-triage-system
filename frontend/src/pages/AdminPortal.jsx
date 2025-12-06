@@ -88,8 +88,7 @@ export default function AdminPortal() {
                     variant="contained" 
                     color="primary"
                     disableElevation
-                    onClick={() => setCreateUserOpen(true)}
-                    sx={{ textTransform: 'none' }}>
+                    onClick={() => setCreateUserOpen(true)}>
                     Create User
                   </Button>
                 </Stack>
