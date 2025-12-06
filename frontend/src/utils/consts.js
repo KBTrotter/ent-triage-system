@@ -45,3 +45,21 @@ export const NAV_PAGES = [
   { label: "Dashboard", path: "/dashboard" },
   { label: "Admin Portal", path: "/admin", role: "admin" },
 ];
+
+export const USER_ROLE_OPTIONS = [
+  { value: "physician", label: "Physician" },
+  { value: "staff", label: "Staff" },
+  { value: "admin", label: "Admin" },
+];
+
+// helpers for changing roles to Title Case for display
+export const ROLE_LABEL_MAP = USER_ROLE_OPTIONS.reduce((acc, opt) => {
+  acc[opt.value] = opt.label;
+  return acc;
+}, {});
+
+export const roleLabel = (role) => {
+  if (role === null || role === undefined) return "";
+  const key = String(role).toLowerCase();
+  return ROLE_LABEL_MAP[key];
+};

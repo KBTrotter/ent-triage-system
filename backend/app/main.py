@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlmodel import Session, text
 from app.auth.routes import router as auth_routes
 from app.routes.triageCase import router as triage_routes
+from app.routes.user import router as user_routes
 from app.core.database import engine
 from app.core.config import settings
 from app.core.dependencies import get_db
@@ -20,9 +21,6 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
-app.include_router(auth_routes)
-app.include_router(triage_routes)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.ALLOWED_ORIGINS,
@@ -30,6 +28,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth_routes)
+app.include_router(triage_routes)
+app.include_router(user_routes)
 
 @app.get("/")
 def root():

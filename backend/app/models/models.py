@@ -1,7 +1,35 @@
-from sqlmodel import SQLModel, Field, Relationship
-from typing import Optional, List
+from sqlmodel import SQLModel, Field
+from typing import Optional
 from datetime import datetime, date
 import uuid
+
+# ============= USER MODELS =============
+class UserBase(SQLModel):
+    firstName: str
+    lastName: str
+    email: str
+    role: str
+
+class UserCreate(UserBase):
+    password: Optional[str] = None
+
+class UserUpdate(SQLModel):
+    firstName: Optional[str] = None
+    lastName: Optional[str] = None
+    email: Optional[str] = None
+    role: Optional[str] = None
+
+class UserPublic(SQLModel):
+    userID: uuid.UUID
+    firstName: str
+    lastName: str
+    email: str
+    role: str
+    lastLogin: Optional[datetime] = None
+
+class UsersList(SQLModel):
+    data: list[UserPublic]
+    count: int
 
 class User(SQLModel, table=True):
     __tablename__ = "User" 
@@ -15,22 +43,9 @@ class User(SQLModel, table=True):
     lastName: str
     email: str = Field(unique=True)
 
-    refreshTokens: List["RefreshToken"] = Relationship(
-        back_populates="user",
-        sa_relationship_kwargs={"primaryjoin": "User.userID==RefreshToken.user_id"} # specify join condition, only way this was able to work
-    )
 
-class RefreshToken(SQLModel, table=True):
-    __tablename__ = "RefreshToken" 
-    __table_args__ = {"schema": "ent"} 
 
-    id: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
-    token: str = Field(unique=True, nullable=False)
-    expires_at: datetime
-    revoked: bool = Field(default=False)
-    user_id: uuid.UUID = Field(foreign_key="ent.User.userID")
 
-    user: Optional["User"] = Relationship(back_populates="refreshTokens")
 
 class Message(SQLModel):
     message: str
