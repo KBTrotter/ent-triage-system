@@ -6,18 +6,16 @@ import {
   themeQuartz,
 } from "ag-grid-community";
 import "./GridStyles.css";
-import { deepPurple } from "@mui/material/colors";
+import { TABLE_COLORS } from "../../theme";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const DataGrid = ({ rowData, columnDefs, gridOptions = {}, loading = false }) => {
   const theme = themeQuartz.withParams({
-    // we can set up a MUI theme to centralize our own custom colors, but for now let's import colors from MUI
-    // https://mui.com/material-ui/customization/color/
-    headerBackgroundColor: deepPurple[200],
-    backgroundColor: deepPurple[50],
-    border: true,
-    rowHoverColor: deepPurple[100],
+    headerBackgroundColor: TABLE_COLORS.headerBackground,
+    backgroundColor: TABLE_COLORS.background,
+    rowHoverColor: TABLE_COLORS.rowHover,
+    border: false,
   });
 
   return (

@@ -4,7 +4,7 @@ import { triageCaseApi } from '../api/triageCaseApi';
 const TriageCaseContext = createContext();
 
 export function TriageCaseProvider({ children }) {
-  const [cases, setCases] = useState([]);
+  const [cases, setCases] = useState([]); // update and track local state for now to avoid too many calls to the db
   const [loading, setLoading] = useState(false);
 
   const fetchCases = useCallback(async () => {

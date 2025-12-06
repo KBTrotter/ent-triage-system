@@ -5,8 +5,8 @@ import dayjs from "dayjs";
 import {
   URGENCY_PRIORITY,
   URGENCY_LABELS,
-  URGENCY_COLORS,
 } from "../utils/consts";
+import { URGENCY_COLORS } from "../theme";
 import CaseDetailsDialog from "../components/caseDetails/CaseDetailsDialog";
 import EditUserDialog from "../components/admin/EditUserDialog";
 import { useTriageCases } from "../context/TriageCaseContext";
