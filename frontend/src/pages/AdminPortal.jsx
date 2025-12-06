@@ -13,6 +13,7 @@ import DataGrid from "../components/grid/DataGrid";
 import { userColumnDefs } from "../utils/coldefs/user";
 import CreateUserDialog from "../components/admin/CreateUserDialog";
 import { userService } from "../api/userService";
+import { toast } from "../utils/toast";
 
 export default function AdminPortal() {
   const [users, setUsers] = useState([]);
@@ -37,6 +38,7 @@ export default function AdminPortal() {
       fetchUsers();
       setCreateUserOpen(false);
       setCreateUserError(null);
+      toast.success(`Successfully created user.`);
     } catch (err) {
       if (err.response?.status === 409) {
         setCreateUserError(
@@ -92,7 +94,7 @@ export default function AdminPortal() {
                   </Button>
                 </Stack>
               </Box>
-              <Box sx={{ height: '75vh', p: 2 }}>
+              <Box sx={{ height: '80vh', p: 2 }}>
                 <DataGrid 
                   loading={loading}
                   rowData={users} 

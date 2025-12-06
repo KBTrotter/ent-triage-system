@@ -8,9 +8,10 @@ import Navbar from "../components/Navbar";
 import { useTriageCases } from "../context/TriageCaseContext";
 
 export default function Dashboard() {
-  const { cases, loading, fetchCases, getUnresolvedCases, getResolvedCases } =
+  const { cases, fetchCases, getUnresolvedCases, getResolvedCases } =
     useTriageCases();
   const [activeTab, setActiveTab] = React.useState(0);
+  const [loading, setLoading] = React.useState(false);
 
   const handleTabChange = (event, newValue) => {
     setActiveTab(newValue);
@@ -19,7 +20,14 @@ export default function Dashboard() {
   React.useEffect(() => {
     const getCases = async () => {
       console.log("Fetching cases");
-      await fetchCases();
+      setLoading(true)
+      try {
+        await fetchCases();
+      } catch (err) {
+        console.error("Failed to fetch cases", err);
+      } finally {
+        setLoading(false)
+      }
     };
     if (cases.length === 0) {
       getCases();
@@ -91,7 +99,7 @@ export default function Dashboard() {
                   sx={{ textTransform: "none", fontWeight: 500 }}
                 />
               </Tabs>
-              <Box sx={{ height: "75vh", p: 2 }}>
+              <Box sx={{ height: "80vh", p: 2 }}>
                 {activeTab === 0 && (
                   <DataGrid
                     rowData={unresolvedCases || []}
