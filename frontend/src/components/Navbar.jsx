@@ -7,11 +7,11 @@ import {
   IconButton,
   Avatar,
   Popover,
+  Stack,
 } from "@mui/material";
-import React, { useState } from "react";
+import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
-import { deepPurple, grey } from "@mui/material/colors";
 import { NAV_PAGES, roleLabel } from "../utils/consts";
 
 export default function Navbar() {
@@ -40,48 +40,98 @@ export default function Navbar() {
   const accountPopoverOpen = Boolean(anchorEl);
 
   return (
-    <AppBar
-      position="static"
-      sx={{ bgcolor: deepPurple[50], color: grey[900] }}>
-      <Toolbar>
-        <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+    <AppBar position="static" color="inherit" elevation={0}>
+      <Toolbar sx={{ py: 1 }}>
+        <Typography
+          variant="h6"
+          component="div"
+          color="text.primary"
+          sx={{
+            flexGrow: 1,
+            fontWeight: 600,
+          }}
+        >
           ENT Triage System
         </Typography>
-        {NAV_PAGES.filter((p) => !p.role || p.role === userRole).map(
-          ({ label, path }) => (
-            <Button key={label} color="inherit" onClick={() => navigate(path)}>
-              {label}
-            </Button>
-          )
-        )}
+        <Stack direction="row" spacing={1} sx={{ mr: 2 }}>
+          {NAV_PAGES.filter((p) => !p.role || p.role === userRole).map(
+            ({ label, path, icon: Icon }) => (
+              <Button
+                key={label}
+                startIcon={Icon && <Icon />}
+                color="inherit"
+                onClick={() => navigate(path)}
+                sx={{
+                  fontWeight: 500,
+                  px: 2,
+                  py: 1,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  "&:hover": {
+                    bgcolor: "action.hover",
+                    color: "primary.main",
+                  },
+                }}
+              >
+                {label}
+              </Button>
+            )
+          )}
+        </Stack>
         <IconButton
           size="large"
           edge="end"
-          color="inherit"
-          onClick={handleOpenUserMenu}>
-          <Avatar sx={{ bgcolor: deepPurple[400] }}>{userInitial}</Avatar>
+          onClick={handleOpenUserMenu}
+          sx={{
+            ml: 1,
+            "&:hover": {
+              bgcolor: "action.hover",
+            },
+          }}
+        >
+          <Avatar
+            sx={{
+              bgcolor: "primary.main",
+            }}
+          >
+            {userInitial}
+          </Avatar>
         </IconButton>
         <Popover
           open={accountPopoverOpen}
           anchorEl={anchorEl}
           onClose={handleCloseUserMenu}
           anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-          transformOrigin={{ vertical: "top", horizontal: "right" }}>
-          <Box display="flex" alignItems="center" p={2} gap={2} minWidth={200}>
-            <Avatar sx={{ bgcolor: deepPurple[400] }}>{userInitial}</Avatar>
+          transformOrigin={{ vertical: "top", horizontal: "right" }}
+        >
+          <Stack
+            direction="row"
+            spacing={2}
+            alignItems="center"
+            p={2}
+          >
+            <Avatar
+              sx={{
+                bgcolor: "primary.main",
+              }}
+            >
+              {userInitial}
+            </Avatar>
             <Box>
               <Typography variant="subtitle1">{username}</Typography>
-              <Typography variant="body1" color="textSecondary">
+              <Typography variant="body2" color="text.secondary">
                 {roleLabel(userRole)}
               </Typography>
             </Box>
-          </Box>
+          </Stack>
           <Box p={2}>
             <Button
               variant="contained"
-              sx={{ bgcolor: deepPurple[400], borderRadius: 8 }}
+              color="primary"
+              fullWidth
+              disableElevation
               onClick={handleLogout}
-              fullWidth>
+            >
               Logout
             </Button>
           </Box>

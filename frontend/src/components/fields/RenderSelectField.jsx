@@ -7,7 +7,7 @@ import {
   MenuItem,
   Chip,
 } from "@mui/material";
-import { URGENCY_COLORS } from "../../utils/consts";
+import { URGENCY_COLORS } from "../../theme";
 
 export default function RenderSelectField({
   editMode,

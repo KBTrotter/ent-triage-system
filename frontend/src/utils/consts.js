@@ -1,4 +1,4 @@
-import { red, green, amber } from "@mui/material/colors";
+import { SupervisorAccount, Assessment } from '@mui/icons-material';
 
 // this should reflect how these enums are stored in db
 export const URGENCY_VALUES = {
@@ -24,12 +24,6 @@ export const URGENCY_LABELS = {
   [URGENCY_VALUES.URGENT]: "Urgent",
 };
 
-export const URGENCY_COLORS = {
-  [URGENCY_VALUES.ROUTINE]: green[800],
-  [URGENCY_VALUES.SEMI_URGENT]: amber[800],
-  [URGENCY_VALUES.URGENT]: red[800],
-};
-
 export const URGENCY_PRIORITY = {
   [URGENCY_VALUES.URGENT]: 1,
   [URGENCY_VALUES.SEMI_URGENT]: 2,
@@ -42,8 +36,8 @@ export const RETURNING_PATIENT_OPTIONS = [
 ];
 
 export const NAV_PAGES = [
-  { label: "Dashboard", path: "/dashboard" },
-  { label: "Admin Portal", path: "/admin", role: "admin" },
+  { label: "Dashboard", path: "/dashboard", icon: Assessment },
+  { label: "Admin Portal", path: "/admin", role: "admin", icon: SupervisorAccount },
 ];
 
 export const USER_ROLE_OPTIONS = [

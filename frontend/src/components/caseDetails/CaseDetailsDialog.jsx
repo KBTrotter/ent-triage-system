@@ -11,6 +11,7 @@ import {
   Box,
   Grid,
   Typography,
+  Divider,
 } from "@mui/material";
 import RenderTextField from "../fields/RenderTextField";
 import RenderSelectField from "../fields/RenderSelectField";
@@ -25,6 +26,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const [formData, setFormData] = useState({});
   const [editMode, setEditMode] = useState(false);
   const [resolveMode, setResolveMode] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
 
   const getChangedFields = (initial, current) => {
@@ -53,9 +55,10 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
       DOB: formData.DOB || "",
       contactInfo: formData.contactInfo || "",
       returningPatient: formData.returningPatient ?? false,
-      overrideUrgency: formData.overrideUrgency ? formData.overrideUrgency : formData.AIUrgency || "",
+      overrideUrgency: formData.overrideUrgency
+        ? formData.overrideUrgency
+        : formData.AIUrgency || "",
       insuranceInfo: formData.insuranceInfo || "Not Provided",
-      AISummary: formData.AISummary || "",
       overrideSummary: formData.overrideSummary || "",
       clinicianSummary: formData.clinicianSummary || "",
       resolutionReason: formData.resolutionReason || "",
@@ -81,7 +84,9 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
     }),
     onSubmit: async (values) => {
       const changedValues = getChangedFields(formik.initialValues, values);
+      setSubmitting(true);
       await onSave(changedValues);
+      setSubmitting(false);
       setEditMode(false);
     },
   });
@@ -105,12 +110,19 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   return (
     <>
       <Dialog open={open} onClose={handleClose} maxWidth="lg" fullWidth>
-        <DialogTitle>Case Details</DialogTitle>
+        <DialogTitle>
+          <Typography sx={{ fontWeight: 600 }}>
+            Case Details
+          </Typography>
+        </DialogTitle>
+        <Divider />
         <DialogContent>
           <Grid container spacing={4}>
             <Grid>
               {/* Left side content */}
-              <Typography variant="h8">Patient Information</Typography>
+              <Typography variant="h8" sx={{ fontWeight: 600 }}>
+                Patient Information
+              </Typography>
               <Box mt={2} display="flex" flexDirection="column" gap={2}>
                 <RenderTextField
                   editMode={editMode}
@@ -158,9 +170,12 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                 display: "flex",
                 flexDirection: "column",
                 gap: 2,
-              }}>
+              }}
+            >
               {/* Right side content */}
-              <Typography variant="h8">Case Information</Typography>
+              <Typography variant="h8" sx={{ fontWeight: 600 }}>
+                Case Information
+              </Typography>
               <Box>
                 <Box mb={2}>
                   <RenderSelectField
@@ -175,11 +190,19 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                     renderChip
                   />
                 </Box>
+                <Box mb={2}>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    Date Created
+                  </Typography>
+                  <Typography variant="body2">
+                    {caseData.dateCreated}
+                  </Typography>
+                </Box>
                 <Typography variant="subtitle2" color="textSecondary">
                   AI Summary
                 </Typography>
                 <Typography variant="body2">
-                  {formik.values.AISummary || "---"}
+                  {caseData.AISummary || "---"}
                 </Typography>
               </Box>
               {editMode || formik.values.overrideSummary ? (
@@ -225,14 +248,15 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         <DialogActions>
           {editMode ? (
             <>
-              <Button onClick={formik.handleSubmit} variant="contained">
+              <Button disabled={submitting} onClick={formik.handleSubmit} variant="contained">
                 Save
               </Button>
               <Button
                 onClick={() => {
                   formik.resetForm();
                   setEditMode(false);
-                }}>
+                }}
+              >
                 Cancel
               </Button>
             </>
@@ -253,7 +277,10 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
         open={resolveMode}
         onClose={() => setResolveMode(false)}
         onResolve={(data) => {
-          onSave({ resolutionReason: data.resolutionReason, caseID: caseData.caseID });
+          onSave({
+            resolutionReason: data.resolutionReason,
+            caseID: caseData.caseID,
+          });
           setResolveMode(false);
           onClose();
         }}

@@ -9,6 +9,7 @@ import {
   Button,
   Box,
   Typography,
+  Divider
 } from "@mui/material";
 import RenderTextField from "../fields/RenderTextField";
 import RenderSelectField from "../fields/RenderSelectField";
@@ -16,6 +17,7 @@ import { USER_ROLE_OPTIONS } from "../../utils/consts";
 
 export default function CreateUserDialog({ open, onClose, onSave, error }) {
   const [localError, setLocalError] = React.useState(null);
+  const [submitting, setSubmitting] = React.useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -32,8 +34,10 @@ export default function CreateUserDialog({ open, onClose, onSave, error }) {
         .required("Email is required"),
       role: Yup.string().required("Role is required"),
     }),
-    onSubmit: (values) => {
-      onSave(values);
+    onSubmit: async (values) => {
+      setSubmitting(true);
+      await onSave(values);
+      setSubmitting(false);
       formik.resetForm();
     },
   });
@@ -46,9 +50,14 @@ export default function CreateUserDialog({ open, onClose, onSave, error }) {
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>Create New User</DialogTitle>
+        <DialogTitle>
+          <Typography sx={{ fontWeight: 600 }}>
+            Create New User
+          </Typography>
+        </DialogTitle>
+      <Divider />
       <DialogContent>
-        <Box mt={2} display="flex" flexDirection="column" gap={2}>
+        <Box display="flex" flexDirection="column" gap={2}>
           {error && (
             <Typography
               variant="body2"
@@ -90,7 +99,7 @@ export default function CreateUserDialog({ open, onClose, onSave, error }) {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={formik.handleSubmit} variant="contained">
+        <Button disabled={submitting} onClick={formik.handleSubmit} variant="contained">
           Create User
         </Button>
       </DialogActions>

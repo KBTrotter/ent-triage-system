@@ -9,6 +9,7 @@ import {
   Button,
   Grid,
   Typography,
+  Divider
 } from "@mui/material";
 import RenderTextField from "../fields/RenderTextField";
 import RenderSelectField from "../fields/RenderSelectField";
@@ -21,6 +22,7 @@ export default function EditUserDialog({
   onSave,
 }) {
   const [editMode, setEditMode] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -38,8 +40,10 @@ export default function EditUserDialog({
         .required("Email is required"),
       role: Yup.string().required("Role is required"),
     }),
-    onSubmit: (values) => {
-      onSave(values);
+    onSubmit: async (values) => {
+      setSubmitting(true);
+      await onSave(values);
+      setSubmitting(false);
       setEditMode(false);
     },
   });
@@ -51,9 +55,14 @@ export default function EditUserDialog({
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
-      <DialogTitle>User Details</DialogTitle>
+        <DialogTitle>
+          <Typography sx={{ fontWeight: 600 }}>
+            Edit User Details
+          </Typography>
+        </DialogTitle>
+      <Divider />
       <DialogContent>
-        <Grid container spacing={2} sx={{ mt: 1 }}>
+        <Grid container spacing={2}>
           <Grid size={6}>
             <Typography variant="subtitle2" fontWeight="bold" gutterBottom>
               First Name
@@ -102,7 +111,7 @@ export default function EditUserDialog({
         {editMode ? (
           <>
             <Button onClick={() => setEditMode(false)}>Cancel</Button>
-            <Button onClick={formik.handleSubmit} variant="contained">
+            <Button disabled={submitting} onClick={formik.handleSubmit} variant="contained">
               Save
             </Button>
           </>

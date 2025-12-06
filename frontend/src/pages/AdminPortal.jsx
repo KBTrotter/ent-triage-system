@@ -1,10 +1,19 @@
 import Navbar from "../components/Navbar";
-import React, { useEffect, useState } from "react";
-import { Grid, Typography, Button } from "@mui/material";
+import { useEffect, useState } from "react";
+import {
+  Grid,
+  Typography,
+  Box,
+  Paper,
+  Stack,
+  Button,
+} from '@mui/material';
+import { SupervisorAccount } from '@mui/icons-material';
 import DataGrid from "../components/grid/DataGrid";
 import { userColumnDefs } from "../utils/coldefs/user";
 import CreateUserDialog from "../components/admin/CreateUserDialog";
 import { userService } from "../api/userService";
+import { toast } from "../utils/toast";
 
 export default function AdminPortal() {
   const [users, setUsers] = useState([]);
@@ -29,6 +38,7 @@ export default function AdminPortal() {
       fetchUsers();
       setCreateUserOpen(false);
       setCreateUserError(null);
+      toast.success(`Successfully created user.`);
     } catch (err) {
       if (err.response?.status === 409) {
         setCreateUserError(
@@ -43,21 +53,57 @@ export default function AdminPortal() {
   return (
     <>
       <Navbar />
-      <Grid container spacing={2} p={2}>
-        <Grid size={6}>
-          <Typography variant="h4">Admin</Typography>
-        </Grid>
-        <Grid size={6} sx={{ display: "flex", justifyContent: "flex-end" }}>
-          <Button variant="contained" onClick={() => setCreateUserOpen(true)}>
-            Create User
-          </Button>
-        </Grid>
-        <Grid size={12}>
-          <Grid size={12} sx={{ height: "75vh" }}>
-            <DataGrid rowData={users} columnDefs={userColumnDefs(fetchUsers)} />
+      <Box sx={{ bgcolor: 'background.default' }}>
+        <Grid container spacing={3} sx={{ p: 3 }}>
+          <Grid size={12}>
+            <Paper
+              elevation={0}
+              sx={{
+                border: 1,
+                borderColor: 'divider',
+                borderRadius: 2,
+                overflow: 'hidden',
+              }}>
+              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+                <Stack direction="row" spacing={2} alignItems="center">
+                  <Box
+                    sx={{
+                      width: 40,
+                      height: 40,
+                      borderRadius: 2,
+                      bgcolor: 'primary.main',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}>
+                    <SupervisorAccount sx={{ fontSize: 24, color: 'white' }} />
+                  </Box>
+                  <Typography 
+                    variant="h5" 
+                    color="text.primary"
+                    sx={{ fontWeight: 600, flexGrow: 1 }}>
+                    Admin
+                  </Typography>
+                  <Button 
+                    variant="contained" 
+                    color="primary"
+                    disableElevation
+                    onClick={() => setCreateUserOpen(true)}>
+                    Create User
+                  </Button>
+                </Stack>
+              </Box>
+              <Box sx={{ height: '80vh', p: 2 }}>
+                <DataGrid 
+                  loading={loading}
+                  rowData={users} 
+                  columnDefs={userColumnDefs(fetchUsers)} 
+                />
+              </Box>
+            </Paper>
           </Grid>
         </Grid>
-      </Grid>
+      </Box>
       <CreateUserDialog
         open={createUserOpen}
         onClose={() => {
