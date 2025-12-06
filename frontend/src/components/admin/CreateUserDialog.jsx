@@ -15,8 +15,7 @@ import RenderTextField from "../fields/RenderTextField";
 import RenderSelectField from "../fields/RenderSelectField";
 import { USER_ROLE_OPTIONS } from "../../utils/consts";
 
-export default function CreateUserDialog({ open, onClose, onSave, error }) {
-  const [localError, setLocalError] = React.useState(null);
+export default function CreateUserDialog({ open, onClose, onSave }) {
   const [submitting, setSubmitting] = React.useState(false);
 
   const formik = useFormik({
@@ -44,7 +43,6 @@ export default function CreateUserDialog({ open, onClose, onSave, error }) {
 
   const handleClose = () => {
     formik.resetForm();
-    setLocalError(null);
     onClose();
   };
 
@@ -58,14 +56,6 @@ export default function CreateUserDialog({ open, onClose, onSave, error }) {
       <Divider />
       <DialogContent>
         <Box display="flex" flexDirection="column" gap={2}>
-          {error && (
-            <Typography
-              variant="body2"
-              color="error"
-              sx={{ textAlign: "center", mb: 1 }}>
-              {error}
-            </Typography>
-          )}
           <RenderTextField
             editMode={true}
             formik={formik}

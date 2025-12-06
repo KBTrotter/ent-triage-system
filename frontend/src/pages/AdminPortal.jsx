@@ -1,14 +1,7 @@
 import Navbar from "../components/Navbar";
 import { useEffect, useState } from "react";
-import {
-  Grid,
-  Typography,
-  Box,
-  Paper,
-  Stack,
-  Button,
-} from '@mui/material';
-import { SupervisorAccount } from '@mui/icons-material';
+import { Grid, Typography, Box, Paper, Stack, Button } from "@mui/material";
+import { SupervisorAccount } from "@mui/icons-material";
 import DataGrid from "../components/grid/DataGrid";
 import { userColumnDefs } from "../utils/coldefs/user";
 import CreateUserDialog from "../components/admin/CreateUserDialog";
@@ -19,7 +12,6 @@ export default function AdminPortal() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [createUserOpen, setCreateUserOpen] = useState(false);
-  const [createUserError, setCreateUserError] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -37,15 +29,14 @@ export default function AdminPortal() {
       await userService.createUser(userData);
       fetchUsers();
       setCreateUserOpen(false);
-      setCreateUserError(null);
       toast.success(`Successfully created user.`);
     } catch (err) {
       if (err.response?.status === 409) {
-        setCreateUserError(
-          "Failed to create user: User with this email already exists"
+        toast.error(
+          `Failed to create user: User with this email already exists.`
         );
       } else {
-        setCreateUserError("Failed to create user, please try again");
+        toast.error(`Failed to create user, please try again.`);
       }
     }
   };
@@ -53,39 +44,39 @@ export default function AdminPortal() {
   return (
     <>
       <Navbar />
-      <Box sx={{ bgcolor: 'background.default' }}>
+      <Box sx={{ bgcolor: "background.default" }}>
         <Grid container spacing={3} sx={{ p: 3 }}>
           <Grid size={12}>
             <Paper
               elevation={0}
               sx={{
                 border: 1,
-                borderColor: 'divider',
+                borderColor: "divider",
                 borderRadius: 2,
-                overflow: 'hidden',
+                overflow: "hidden",
               }}>
-              <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+              <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
                 <Stack direction="row" spacing={2} alignItems="center">
                   <Box
                     sx={{
                       width: 40,
                       height: 40,
                       borderRadius: 2,
-                      bgcolor: 'primary.main',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      bgcolor: "primary.main",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
                     }}>
-                    <SupervisorAccount sx={{ fontSize: 24, color: 'white' }} />
+                    <SupervisorAccount sx={{ fontSize: 24, color: "white" }} />
                   </Box>
-                  <Typography 
-                    variant="h5" 
+                  <Typography
+                    variant="h5"
                     color="text.primary"
                     sx={{ fontWeight: 600, flexGrow: 1 }}>
                     Admin
                   </Typography>
-                  <Button 
-                    variant="contained" 
+                  <Button
+                    variant="contained"
                     color="primary"
                     disableElevation
                     onClick={() => setCreateUserOpen(true)}>
@@ -93,11 +84,11 @@ export default function AdminPortal() {
                   </Button>
                 </Stack>
               </Box>
-              <Box sx={{ height: '80vh', p: 2 }}>
-                <DataGrid 
+              <Box sx={{ height: "80vh", p: 2 }}>
+                <DataGrid
                   loading={loading}
-                  rowData={users} 
-                  columnDefs={userColumnDefs(fetchUsers)} 
+                  rowData={users}
+                  columnDefs={userColumnDefs(fetchUsers)}
                 />
               </Box>
             </Paper>
@@ -108,10 +99,8 @@ export default function AdminPortal() {
         open={createUserOpen}
         onClose={() => {
           setCreateUserOpen(false);
-          setCreateUserError(null);
         }}
         onSave={handleCreateUser}
-        error={createUserError}
       />
     </>
   );

@@ -227,7 +227,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
 
               {caseData?.status === "resolved" && (
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-                  <Typography variant="h8">Resolution Information</Typography>
+                  <Typography variant="h8" sx={{ fontWeight: 600 }}>Resolution Information</Typography>
                   <RenderTextField
                     editMode={false}
                     formik={formik}
