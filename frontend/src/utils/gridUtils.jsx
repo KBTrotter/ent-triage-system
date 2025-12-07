@@ -44,6 +44,8 @@ export const EditCaseButtonCellRenderer = (params) => {
   };
 
   const handleSave = async (updatedData) => {
+    if (Object.keys(updatedData).length === 0) return;
+    console.log(updatedData)
     const isResolving = Boolean(updatedData.resolutionReason);
     try {
       if (isResolving) {
@@ -91,20 +93,19 @@ export const EditUserButtonCellRenderer = (params) => {
   };
 
   const handleSave = async (updatedData) => {
+    if (Object.keys(updatedData).length === 0) return;
     console.log("Saving with data: ", updatedData);
     setSaving(true);
-    if (updatedData) {
-      try {
-        await userService.updateUser(userData.userID, updatedData);
-        params.onUserUpdated?.(); //refresh user grid after update
-        handleClose();
-        toast.success(`Successfully updated user.`);
-      } catch (err) {
-        toast.error(`Failed to update user.`);
-        console.log(
-          "Failed to update user: " + (err.message || "Unknown error")
-        );
-      }
+    try {
+      await userService.updateUser(userData.userID, updatedData);
+      params.onUserUpdated?.(); //refresh user grid after update
+      handleClose();
+      toast.success(`Successfully updated user.`);
+    } catch (err) {
+      toast.error(`Failed to update user.`);
+      console.log(
+        "Failed to update user: " + (err.message || "Unknown error")
+      );
     }
     setSaving(false);
   };

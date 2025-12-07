@@ -21,6 +21,7 @@ import {
   URGENCY_LABELS,
   RETURNING_PATIENT_OPTIONS,
 } from "../../utils/consts";
+import { getChangedFields } from "../../utils/utils"
 
 export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const [formData, setFormData] = useState({});
@@ -28,18 +29,6 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const [resolveMode, setResolveMode] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const { user } = useAuth();
-
-  const getChangedFields = (initial, current) => {
-    const changed = {};
-
-    Object.keys(current).forEach((key) => {
-      if (initial[key] !== current[key]) {
-        changed[key] = current[key];
-      }
-    });
-
-    return changed;
-  };
 
   useEffect(() => {
     if (caseData) {

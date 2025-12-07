@@ -14,6 +14,7 @@ import {
 import RenderTextField from "../fields/RenderTextField";
 import RenderSelectField from "../fields/RenderSelectField";
 import { USER_ROLE_OPTIONS } from "../../utils/consts";
+import { getChangedFields } from "../../utils/utils"
 
 export default function EditUserDialog({
   open,
@@ -41,8 +42,9 @@ export default function EditUserDialog({
       role: Yup.string().required("Role is required"),
     }),
     onSubmit: async (values) => {
+      const changedValues = getChangedFields(formik.initialValues, values);
       setSubmitting(true);
-      await onSave(values);
+      await onSave(changedValues);
       setSubmitting(false);
       setEditMode(false);
     },
