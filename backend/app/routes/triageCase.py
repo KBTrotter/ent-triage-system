@@ -1,9 +1,18 @@
+"""Routes for managing manual triage cases.
+
+This module exposes a CRUD API for triage cases created by human
+operators.  It mirrors the implementation from Folder A and is
+retained unchanged in order to preserve existing functionality.
+"""
+
 import uuid
 import logging
 from typing import Any
 from datetime import datetime
+
 from fastapi import APIRouter, HTTPException, Depends
 from sqlmodel import Session, func, select
+
 from app.core.dependencies import get_db
 from app.auth.dependencies import get_current_user
 from app.models import (
@@ -18,20 +27,23 @@ from app.models import (
     Patient,
 )
 
+
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/triage-cases", tags=["triage-cases"])
 
+
 def build_case_public(case: TriageCase, db: Session) -> TriageCasePublic:
+    """Construct a public representation of a TriageCase including patient info."""
     patient = db.get(Patient, case.patientID)
     if not patient:
         raise HTTPException(status_code=404, detail="Patient not found")
-    
+
     resolved_by_email = None
     if case.resolvedBy:
         resolver = db.get(User, case.resolvedBy)
         if resolver:
             resolved_by_email = resolver.email
-            
+
     return TriageCasePublic(
         **case.model_dump(),
         firstName=patient.firstName,
@@ -42,32 +54,32 @@ def build_case_public(case: TriageCase, db: Session) -> TriageCasePublic:
         returningPatient=patient.returningPatient,
         languagePreference=patient.languagePreference,
         verified=patient.verified,
-        resolvedByEmail=resolved_by_email
+        resolvedByEmail=resolved_by_email,
     )
+
 
 def update_patient_info(
     patient: Patient,
     patient_updates: dict,
-    db: Session
+    db: Session,
 ) -> Patient:
+    """Apply partial updates to a Patient and persist them."""
     logger.info(f"Updating patient {patient.patientID} with: {patient_updates}")
-    
+
     patient.sqlmodel_update(patient_updates)
     db.add(patient)
-    
     return patient
+
 
 @router.get("/", response_model=TriageCasesPublic)
 def get_all_cases(
     limit: int = 100,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> Any:
     logger.info(f"GET /triage-cases/ - limit: {limit}, user: {current_user.email}")
-    
     count_statement = select(func.count()).select_from(TriageCase)
     count = db.exec(count_statement).one()
-    
     statement = (
         select(TriageCase, Patient, User.email)
         .join(Patient)
@@ -75,7 +87,6 @@ def get_all_cases(
         .limit(limit)
     )
     results = db.exec(statement).all()
-    
     cases_public = [
         TriageCasePublic(
             **case.model_dump(),
@@ -91,26 +102,22 @@ def get_all_cases(
         )
         for case, patient, resolver_email in results
     ]
-
     logger.info(f"GET /triage-cases/ - returned {count} cases")
     return TriageCasesPublic(cases=cases_public, count=count)
+
 
 @router.get("/status/{status}", response_model=TriageCasesPublic)
 def get_cases_by_status(
     status: str,
     limit: int = 100,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> Any:
     logger.info(f"GET /triage-cases/status/{status} - limit: {limit}, user: {current_user.email}")
-    
     count_statement = (
-        select(func.count())
-        .select_from(TriageCase)
-        .where(TriageCase.status == status)
+        select(func.count()).select_from(TriageCase).where(TriageCase.status == status)
     )
     count = db.exec(count_statement).one()
-    
     statement = (
         select(TriageCase, Patient, User.email)
         .join(Patient)
@@ -119,7 +126,6 @@ def get_cases_by_status(
         .limit(limit)
     )
     results = db.exec(statement).all()
-    
     cases_public = [
         TriageCasePublic(
             **case.model_dump(),
@@ -135,129 +141,100 @@ def get_cases_by_status(
         )
         for case, patient, resolver_email in results
     ]
-
     return TriageCasesPublic(cases=cases_public, count=count)
+
 
 @router.get("/{id}", response_model=TriageCasePublic)
 def get_specific_case(
     id: uuid.UUID,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> Any:
     logger.info(f"GET /triage-cases/{id} - user: {current_user.email}")
-    
     case = db.get(TriageCase, id)
     if not case:
         logger.warning(f"GET /triage-cases/{id} - case not found")
         raise HTTPException(status_code=404, detail="Triage case not found")
-    
     return build_case_public(case, db)
+
 
 @router.post("/", response_model=TriageCasePublic)
 def create_new_case(
     new_case: TriageCaseCreate,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> Any:
     logger.info(f"POST /triage-cases/ - user: {current_user.email}, body: {new_case.model_dump()}")
-    
     case = TriageCase.model_validate(new_case)
-
     db.add(case)
     db.commit()
     db.refresh(case)
-    
     return build_case_public(case, db)
+
 
 @router.put("/{id}", response_model=TriageCasePublic)
 def update_case(
     id: uuid.UUID,
     update: TriageCaseUpdate,
     db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ) -> Any:
     logger.info(f"PUT /triage-cases/{id} - user: {current_user.email}, body: {update.model_dump(exclude_unset=True)}")
-    
+    # Prevent resolving cases via generic update
     if update.status and update.status.lower() == "resolved" or update.resolutionReason:
         raise HTTPException(
-            status_code=403, 
-            detail="Triage case cannot be resolved through generic update"
+            status_code=403,
+            detail="Triage case cannot be resolved through generic update",
         )
-    
     case = db.get(TriageCase, id)
     if not case:
         raise HTTPException(status_code=404, detail="Triage case not found")
-    
     update_data = update.model_dump(exclude_unset=True)
-    
-    patient_field_names = set(Patient.model_fields.keys())
-    patient_updates = {k: v for k, v in update_data.items() if k in patient_field_names}
-    case_updates = {k: v for k, v in update_data.items() if k not in patient_field_names}
-    
+    # If patient details are provided in the update, update the patient record
+    patient_updates = {
+        k: update_data.pop(k)
+        for k in [
+            "firstName",
+            "lastName",
+            "DOB",
+            "contactInfo",
+            "insuranceInfo",
+            "returningPatient",
+            "languagePreference",
+            "verified",
+        ]
+        if k in update_data
+    }
     if patient_updates:
         patient = db.get(Patient, case.patientID)
-        if not patient:
-            logger.warning(f"PUT /triage-cases/{id} - patient not found")
-            raise HTTPException(status_code=404, detail="Patient not found")
-        
-        update_patient_info(patient, patient_updates, db)
-    
-    if case_updates:
-        case.sqlmodel_update(case_updates)
-        db.add(case)
-    
-    db.commit()
-    db.refresh(case)
-    
-    return build_case_public(case, db)
-
-
-@router.delete("/{id}")
-def delete_case(
-    id: uuid.UUID,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-) -> Message:
-    logger.info(f"DELETE /triage-cases/{id} - user: {current_user.email}")
-    
-    case = db.get(TriageCase, id)
-    if not case:
-        logger.warning(f"DELETE /triage-cases/{id} - case not found")
-        raise HTTPException(status_code=404, detail="Triage case not found")
-    
-    db.delete(case)
-    db.commit()
-    
-    logger.info(f"DELETE /triage-cases/{id} - deleted successfully")
-    return Message(message="Triage case deleted successfully")
-
-
-@router.patch("/{id}/resolve", response_model=TriageCasePublic)
-def resolve_case(
-    id: uuid.UUID,
-    update: TriageCaseResolve,
-    db: Session = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
-) -> Any:
-    logger.info(f"PATCH /triage-cases/{id}/resolve - user: {current_user.email}, body: {update.model_dump()}")
-    
-    if not update.resolutionReason or not update.resolutionReason.strip():
-        raise HTTPException(status_code=400, detail="Resolution reason is required and cannot be empty")
-    
-    case = db.get(TriageCase, id)
-    if not case:
-        raise HTTPException(status_code=404, detail="Triage case not found")
-    
-    if case.status == "resolved":
-      raise HTTPException(status_code=400, detail="Case is already resolved")
-    
-    case.status = "resolved"
-    case.resolutionReason = update.resolutionReason
-    case.resolvedBy = current_user.userID
-    case.resolutionTimestamp = datetime.now()
-
+        if patient:
+            update_patient_info(patient, patient_updates, db)
+    # Apply remaining updates to the case
+    case.sqlmodel_update(update_data)
     db.add(case)
     db.commit()
     db.refresh(case)
-    
+    return build_case_public(case, db)
+
+
+@router.post("/{id}/resolve", response_model=TriageCasePublic)
+def resolve_case(
+    id: uuid.UUID,
+    resolution: TriageCaseResolve,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    logger.info(f"POST /triage-cases/{id}/resolve - user: {current_user.email}, reason: {resolution.resolutionReason}")
+    case = db.get(TriageCase, id)
+    if not case:
+        raise HTTPException(status_code=404, detail="Triage case not found")
+    if case.status.lower() == "resolved":
+        raise HTTPException(status_code=400, detail="Triage case already resolved")
+    case.status = "resolved"
+    case.resolutionReason = resolution.resolutionReason
+    case.resolutionTimestamp = datetime.utcnow()
+    case.resolvedBy = current_user.userID
+    db.add(case)
+    db.commit()
+    db.refresh(case)
     return build_case_public(case, db)

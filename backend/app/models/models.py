@@ -1,17 +1,30 @@
+"""Database and Pydantic models for the ENT triage system.
+
+This module contains SQLModel classes that map to database tables
+within the ``ent`` schema.  It is based on the production models
+from Folder A and extended with ``Encounter`` and ``TriageResult``
+tables to support the AI triage functionality originally defined in
+Folder B.  Additional Pydantic models for request and response
+structures are also defined here where appropriate.
+"""
+
 from sqlmodel import SQLModel, Field
 from typing import Optional
 from datetime import datetime, date
 import uuid
 
-# ============= USER MODELS =============
+
+# ==================== USER MODELS ====================
 class UserBase(SQLModel):
     firstName: str
     lastName: str
     email: str
     role: str
 
+
 class UserCreate(UserBase):
     password: Optional[str] = None
+
 
 class UserUpdate(SQLModel):
     firstName: Optional[str] = None
@@ -27,12 +40,22 @@ class UserPublic(SQLModel):
     role: str
     lastLogin: Optional[datetime] = None
 
+# class UserPublic(SQLModel):
+#     userID: uuid.UUID
+#     firstName: str
+#     lastName: str
+#     email: str
+#     role: str
+#     lastLogin: Optional[datetime] = None
+
+
 class UsersList(SQLModel):
-    data: list[UserPublic]
+    data: list["UserPublic"]
     count: int
 
+
 class User(SQLModel, table=True):
-    __tablename__ = "User" 
+    __tablename__ = "User"
     __table_args__ = {"schema": "ent"}
 
     userID: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
@@ -44,13 +67,11 @@ class User(SQLModel, table=True):
     email: str = Field(unique=True)
 
 
-
-
-
 class Message(SQLModel):
     message: str
 
-# ============= PATIENT MODELS =============
+
+# ==================== PATIENT MODELS ====================
 class PatientBase(SQLModel):
     firstName: str
     lastName: str
@@ -61,14 +82,13 @@ class PatientBase(SQLModel):
     languagePreference: Optional[str] = None
     verified: bool = False
 
+
 class Patient(PatientBase, table=True):
     __tablename__ = "Patient"
     __table_args__ = {"schema": "ent"}
-    
-    patientID: uuid.UUID = Field(
-        default_factory=uuid.uuid4,
-        primary_key=True
-    )
+
+    patientID: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+
 
 class PatientUpdate(SQLModel):
     firstName: Optional[str] = None
@@ -80,7 +100,8 @@ class PatientUpdate(SQLModel):
     languagePreference: Optional[str] = None
     verified: Optional[bool] = None
 
-# ============= TRIAGE CASE MODELS =============
+
+# ==================== TRIAGE CASE MODELS ====================
 class TriageCaseBase(SQLModel):
     transcript: Optional[str] = None
     AIConfidence: Optional[float] = None
@@ -91,10 +112,11 @@ class TriageCaseBase(SQLModel):
     overrideSummary: Optional[str] = None
     overrideUrgency: Optional[str] = None
 
+
 class TriageCase(TriageCaseBase, table=True):
     __tablename__ = "TriageCase"
     __table_args__ = {"schema": "ent"}
-    
+
     caseID: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     patientID: uuid.UUID = Field(foreign_key="ent.Patient.patientID")
     dateCreated: date = Field(default_factory=date.today)
@@ -103,12 +125,14 @@ class TriageCase(TriageCaseBase, table=True):
     resolutionTimestamp: Optional[datetime] = None
     resolvedBy: Optional[uuid.UUID] = None
 
+
 class TriageCaseCreate(SQLModel):
     patientID: uuid.UUID
     transcript: str
     AIConfidence: Optional[float] = None
     AISummary: Optional[str] = None
     AIUrgency: Optional[str] = None
+
 
 class TriageCaseUpdate(SQLModel):
     transcript: Optional[str] = None
@@ -126,8 +150,10 @@ class TriageCaseUpdate(SQLModel):
     languagePreference: Optional[str] = None
     verified: Optional[bool] = None
 
+
 class TriageCaseResolve(SQLModel):
     resolutionReason: str
+
 
 class TriageCasePublic(TriageCaseBase, PatientBase):
     caseID: uuid.UUID
@@ -139,6 +165,44 @@ class TriageCasePublic(TriageCaseBase, PatientBase):
     resolvedBy: Optional[uuid.UUID] = None
     resolvedByEmail: Optional[str] = None
 
+
 class TriageCasesPublic(SQLModel):
-    cases: list[TriageCasePublic] 
+    cases: list["TriageCasePublic"]
     count: int
+
+
+# ==================== ENCOUNTER MODELS (AI TRIAGE) ====================
+class EncounterBase(SQLModel):
+    """Base attributes for an Encounter.  An encounter represents a single
+    call or interaction and stores the raw transcript and timestamp."""
+
+    callText: str
+    callTimestamp: datetime
+
+
+class Encounter(EncounterBase, table=True):
+    __tablename__ = "Encounter"
+    __table_args__ = {"schema": "ent"}
+
+    encounterID: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    patientID: uuid.UUID = Field(foreign_key="ent.Patient.patientID")
+
+
+# ==================== TRIAGE RESULT MODELS (AI TRIAGE) ====================
+class TriageResultBase(SQLModel):
+    """Base attributes for a triage result returned by the AI."""
+
+    summary: str
+    urgencyLevel: int
+    urgencyLabel: str
+    recommendedAction: str
+    notes: Optional[str] = None
+
+
+class TriageResult(TriageResultBase, table=True):
+    __tablename__ = "TriageResult"
+    __table_args__ = {"schema": "ent"}
+
+    triageID: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
+    encounterID: uuid.UUID = Field(foreign_key="ent.Encounter.encounterID")
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
