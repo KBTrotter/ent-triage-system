@@ -99,7 +99,7 @@ export default function Dashboard() {
                   sx={{ textTransform: "none", fontWeight: 500 }}
                 />
               </Tabs>
-              <Box sx={{ height: "80vh", p: 2 }}>
+              <Box sx={{ height: "70vh", p: 2 }}>
                 {activeTab === 0 && (
                   <DataGrid
                     rowData={unresolvedCases || []}

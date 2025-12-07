@@ -41,7 +41,7 @@ export default function Navbar() {
 
   return (
     <AppBar position="static" color="inherit" elevation={0}>
-      <Toolbar sx={{ py: 1 }}>
+      <Toolbar sx={{ py: 0.5 }}>
         <Typography
           variant="h6"
           component="div"

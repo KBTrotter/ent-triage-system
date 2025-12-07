@@ -93,8 +93,8 @@ export default function AdminPortal() {
                   </Button>
                 </Stack>
               </Box>
-              <Box sx={{ height: '80vh', p: 2 }}>
-                <DataGrid 
+              <Box sx={{ height: "76vh", p: 2 }}>
+                <DataGrid
                   loading={loading}
                   rowData={users} 
                   columnDefs={userColumnDefs(fetchUsers)} 
