@@ -9,8 +9,8 @@ import {
 export const triageCaseColumnDefs = [
   {
     headerName: 'Urgency',
-    flex: 0.75, // flex determines the proportion the column will take up
-    minWidth: 100, // set minimum width to create overflow on smaller window sizes
+    flex: 1, // flex determines the proportion the column will take up
+    minWidth: 150, // set minimum width to create overflow on smaller window sizes
     cellRenderer: UrgencyCellRenderer,
     filter: 'agTextColumnFilter',
     comparator: urgencyComparator,
@@ -48,7 +48,6 @@ export const triageCaseColumnDefs = [
     minWidth: 200,
     valueFormatter: dateTimeFormatter,
     filter: 'agDateColumnFilter',
-    sort: 'desc',
   },
   {
     headerName: 'Summary',

@@ -1,6 +1,6 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 import uuid
 
 # ============= USER MODELS =============
@@ -97,7 +97,7 @@ class TriageCase(TriageCaseBase, table=True):
     
     caseID: uuid.UUID = Field(default_factory=uuid.uuid4, primary_key=True)
     patientID: uuid.UUID = Field(foreign_key="ent.Patient.patientID")
-    dateCreated: date = Field(default_factory=date.today)
+    dateCreated: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     createdBy: Optional[uuid.UUID] = None
     resolutionReason: Optional[str] = None
     resolutionTimestamp: Optional[datetime] = None
@@ -132,7 +132,7 @@ class TriageCaseResolve(SQLModel):
 class TriageCasePublic(TriageCaseBase, PatientBase):
     caseID: uuid.UUID
     patientID: uuid.UUID
-    dateCreated: date
+    dateCreated: datetime
     createdBy: Optional[uuid.UUID] = None
     resolutionReason: Optional[str] = None
     resolutionTimestamp: Optional[datetime] = None
