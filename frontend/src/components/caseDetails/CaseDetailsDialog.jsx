@@ -22,6 +22,7 @@ import {
   RETURNING_PATIENT_OPTIONS,
 } from "../../utils/consts";
 import { getChangedFields } from "../../utils/utils"
+import dayjs from "dayjs";
 
 export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
   const [formData, setFormData] = useState({});
@@ -184,7 +185,7 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                     Date Created
                   </Typography>
                   <Typography variant="body2">
-                    {caseData.dateCreated}
+                    {dayjs(caseData.dateCreated).format("h:mm A, MM/DD/YYYY")}
                   </Typography>
                 </Box>
                 <Typography variant="subtitle2" color="textSecondary">
@@ -206,7 +207,6 @@ export default function CaseDetailsDialog({ open, onClose, caseData, onSave }) {
                   Override Summary
                 </Button>
               )}
-              <Typography variant="subtitle2">Case Notes</Typography>
               <RenderTextField
                 editMode={editMode}
                 formik={formik}
